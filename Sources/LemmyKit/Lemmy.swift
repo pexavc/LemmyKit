@@ -11,6 +11,8 @@ import Combine
 public class Lemmy {
     public let id: UUID
     
+    static var shared: Lemmy? = nil
+    
     private var api: Network
     private var pictrs: Network
     
@@ -32,5 +34,17 @@ public class Lemmy {
         return try? await pictrs.request(
             request
         ).async()
+    }
+    
+    public static func request<R: Request>(_ request: R) async -> R.TransformedResponse? {
+        guard let shared else { return nil }
+        
+        return await shared.request(request)
+    }
+    
+    public static func pictrs<R: Request>(_ request: R) async -> R.TransformedResponse? {
+        guard let shared else { return nil }
+        
+        return await shared.pictrs(request)
     }
 }

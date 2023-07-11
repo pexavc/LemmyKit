@@ -34,6 +34,19 @@ let data = await lemmy.request(
 )
 
 print(data?.site_view.site.name)
+
+/* OR via static usage */
+
+//Must be set to use static functions
+//Must be the baseURL of your instance
+LemmyKit.baseUrl = "https://neatia.xyz"
+
+let staticInfo = await Lemmy.request(
+    Login(username_or_email: "pexavc",
+          password: "...")
+)
+
+print(staticInfo)
 ```
 
 ### Other
