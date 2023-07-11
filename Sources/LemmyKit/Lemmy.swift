@@ -1,5 +1,5 @@
 //
-//  LemmyKit.swift
+//  Lemmy.swift
 //  
 //
 //  Created by PEXAVC on 5/12/23.
@@ -24,6 +24,12 @@ public class Lemmy {
     
     public func request<R: Request>(_ request: R) async -> R.TransformedResponse? {
         return try? await api.request(
+            request
+        ).async()
+    }
+    
+    public func pictrs<R: Request>(_ request: R) async -> R.TransformedResponse? {
+        return try? await pictrs.request(
             request
         ).async()
     }

@@ -1,5 +1,5 @@
 //
-//  Lemmy.swift
+//  LemmyKit.swift
 //  
 //
 //  Created by PEXAVC on 7/11/23.
