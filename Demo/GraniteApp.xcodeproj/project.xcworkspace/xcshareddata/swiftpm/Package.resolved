@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "granite",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pexavc/Granite.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c4930c5c2d881258e7448befe2f7d334b1746420"
+      }
+    },
+    {
+      "identity" : "lemmykit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pexavc/LemmyKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "d022fbc0ef13314db1ee5e7ac06d5e7447c79864"
+      }
+    }
+  ],
+  "version" : 2
+}
