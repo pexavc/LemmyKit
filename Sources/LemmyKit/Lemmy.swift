@@ -53,6 +53,8 @@ public class Lemmy {
     }
 }
 
+//MARK: -- Auth/Registration
+
 public extension Lemmy {
     func login(username: String, password: String) async -> String? {
         guard let result = try? await api.request(
@@ -69,6 +71,11 @@ public extension Lemmy {
         
         return await shared.login(username: username, password: password)
     }
+}
+
+//MARK: -- Fetch
+    
+public extension Lemmy {
     
     func communities(_ type: ListingType = .local,
                      auth: String? = nil) async -> [Community] {
@@ -86,6 +93,27 @@ public extension Lemmy {
         guard let shared else { return [] }
         
         return await shared.communities(type, auth: auth)
+    }
+    
+    func post(_ postId: PostId? = nil,
+              comment: Comment? = nil,
+              auth: String? = nil) async -> Post? {
+        guard let result = try? await api.request(
+            GetPost(id: postId,
+                    comment_id: comment?.id,
+                    auth: auth ?? self.auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result.post_view.post
+    }
+    static func post(_ postId: PostId? = nil,
+                     comment: Comment? = nil,
+                     auth: String? = nil) async -> Post? {
+        guard let shared else { return nil }
+        
+        return await shared.post(postId, comment: comment, auth: auth)
     }
     
     func posts(_ community: Community,
@@ -148,5 +176,112 @@ public extension Lemmy {
                                      community: community,
                                      type: type,
                                      auth: auth)
+    }
+}
+
+//MARK: -- Create
+
+public extension Lemmy {
+    @discardableResult
+    func createCommunity(_ title: String, auth: String) async -> Community? {
+        guard let result = try? await api.request(
+            CreateCommunity(name: title.lowercased(), title: title, auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result.community_view.community
+    }
+    @discardableResult
+    static func createCommunity(_ title: String, auth: String? = nil) async -> Community? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.createCommunity(title, auth: validAuth)
+    }
+    
+    @discardableResult
+    func createPost(_ title: String,
+                    content: String,
+                    url: String? = nil,
+                    body: String? = nil,
+                    community: Community,
+                    auth: String) async -> Post? {
+        guard let result = try? await api.request(
+            CreatePost(name: title,
+                       community_id: community.id,
+                       url: url,
+                       body: body,
+                       auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result.post_view.post
+    }
+    @discardableResult
+    static func createPost(_ title: String,
+                           content: String,
+                           url: String? = nil,
+                           body: String? = nil,
+                           community: Community,
+                           auth: String? = nil) async -> Post? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.createPost(title,
+                                       content: content,
+                                       url: url,
+                                       body: body,
+                                       community: community,
+                                       auth: validAuth)
+    }
+    
+    @discardableResult
+    func createComment(_ content: String,
+                       post: Post,
+                       parent: Comment? = nil,
+                       auth: String) async -> Comment? {
+        guard let result = try? await api.request(
+            CreateComment(content: content,
+                          post_id: post.id,
+                          parent_id: parent?.id,
+                          auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result.comment_view.comment
+    }
+    @discardableResult
+    static func createComment(_ content: String,
+                              post: Post,
+                              parent: Comment? = nil,
+                              auth: String? = nil) async -> Comment? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.createComment(content,
+                                          post: post,
+                                          parent: parent,
+                                          auth: validAuth)
     }
 }

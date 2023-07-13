@@ -95,6 +95,26 @@ for comment in comments {
 }
 ```
 
+```swift
+//Posting to a community
+let post = await Lemmy.createPost("[DEBUG] From LemmyKit",
+                                  content: "Hello World",
+                                  community: debugCommunity)
+
+```
+
+```swift
+//Commenting on a post
+let comment = await Lemmy.createComment("Test comment", post: post)
+```
+
+```swift
+//Replying to a comment
+await Lemmy.createComment("Reply to a comment",
+                          post: post,
+                          parent: comment)
+```
+
 ## Swift Interface API
 
 > Currently supported requests in the Swift interface. Will be updated periodically.
@@ -105,7 +125,7 @@ for comment in comments {
 func login(username: String, password: String) async -> String?
 ```
 
-### GETs
+### Fetch
 
 ```swift
 func communities(_ type: ListingType = .local,
@@ -120,6 +140,24 @@ func comments(_ post: Post? = nil,
               community: Community? = nil,
               type: ListingType = .local,
               auth: String? = nil) async -> [Comment]
+```
+
+### Create
+
+```swift
+func createCommunity(_ title: String, auth: String) async -> Community?
+                 
+func createPost(_ title: String,
+                content: String,
+                url: String? = nil,
+                body: String? = nil,
+                community: Community,
+                auth: String) async -> Post?
+
+func createComment(_ content: String,
+                   post: Post,
+                   parent: Comment? = nil,
+                   auth: String) async -> Comment? {
 ```
 
 
