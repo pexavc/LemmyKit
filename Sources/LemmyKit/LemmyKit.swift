@@ -26,10 +26,23 @@ public class LemmyKit {
             }
             
             _baseUrl = "https://" + host + "/api/" + VERSION
-            Lemmy.shared = .init(apiUrl: _baseUrl)
+            current = .init(apiUrl: _baseUrl)
         }
     }
     static var _baseUrl: String = ""
     
+    public static var current: Lemmy?
+    
+    public static var auth: String? {
+        get {
+            return Lemmy.shared?.auth
+        }
+        set {
+            Lemmy.shared?.auth = newValue
+        }
+    }
+    
     public static var VERSION: String = "v3"
+    
+    public static var logLevel: LemmyLogLevel = .debug
 }

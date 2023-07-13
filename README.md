@@ -6,6 +6,8 @@ This Swift Package is based on [lemmy-js-client](https://github.com/LemmyNet/lem
 
 All functions are auto-transpiled and upto date with the related js library. This will be updated manually if they are out of sync.
 
+For an online doc to reference the API supported please visit this [link](https://join-lemmy.org/api/). The docs are meant for the JS side of things, but those parameters and functions are similarly implemented here.
+
 ## Requirements
 
 - iOS 14 or later
@@ -14,6 +16,8 @@ All functions are auto-transpiled and upto date with the related js library. Thi
 ## Usage
 
 > Choose the build scheme `LemmyExecutable` to test functions immediately. Can be used as a debugger for a live instances for example. Or simply turned into a CLI tool. Otherwise examples are meant to showcase in-app usage.
+
+### Basic Requests
 
 ```swift
 import LemmyKit
@@ -48,6 +52,76 @@ let staticInfo = await Lemmy.request(
 
 print(staticInfo)
 ```
+
+### Swift Interface
+
+> Requests wrapped in easy to call swift functions for simple get, set, and puts.
+
+```swift
+//Setting authentication with a login
+LemmyKit.auth = await Lemmy.login(username: "pexavc",
+                                  password: "...")
+
+```
+
+```swift
+//Getting all Local Communities
+let communities = await Lemmy.communities(.local)
+
+var debugCommunity: Community?
+for community in communities {
+    print("Community found: \(community.name)")
+    if community.name == "debug" {
+        debugCommunity = community
+    }
+}
+```
+
+```swift
+//Getting posts for a specific community
+let posts = await Lemmy.posts(debugCommunity)
+
+for post in posts {
+    print("Post found: \(post.name)")
+}
+```
+
+```swift
+//Getting comments from a post
+let comments = await Lemmy.comments(posts.first)
+
+for comment in comments {
+    print("Comment found: \(comment.content)")
+}
+```
+
+## Swift Interface API
+
+> Currently supported requests in the Swift interface. Will be updated periodically.
+
+### Auth/Registration
+
+```swift
+func login(username: String, password: String) async -> String?
+```
+
+### GETs
+
+```swift
+func communities(_ type: ListingType = .local,
+                 auth: String? = nil) async -> [Community]
+                 
+func posts(_ community: Community,
+           type: ListingType = .local,
+           auth: String? = nil) async -> [Post]
+
+func comments(_ post: Post? = nil,
+              comment: Comment? = nil,
+              community: Community? = nil,
+              type: ListingType = .local,
+              auth: String? = nil) async -> [Comment]
+```
+
 
 ### Other
 

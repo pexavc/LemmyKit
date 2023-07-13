@@ -8,32 +8,38 @@
 import Foundation
 import LemmyKit
 
-let baseUrl: String = "https://neatia.xyz/api/"+LemmyKit.VERSION
-
-let lemmy = Lemmy(apiUrl: baseUrl)
-
-let info = await lemmy.request(
-    Login(username_or_email: "pexavc",
-          password: "...")
-)
-
-print(info)
-
-let data = await lemmy.request(
-    GetSite(auth: info?.jwt)
-)
-
-print(data?.site_view.site.name)
-
-/* OR via static usage */
-
-//Must be set to use static functions
-//Must be the baseURL of your instance
+//Initializing a global Lemmy client with a baseURL
 LemmyKit.baseUrl = "https://neatia.xyz"
 
-let staticInfo = await Lemmy.request(
-    Login(username_or_email: "pexavc",
-          password: "...")
-)
+//Setting authentication with a login
+LemmyKit.auth = await Lemmy.login(username: "pexavc",
+                                  password: "...")
 
-print(staticInfo)
+//Getting all Local Communities
+let communities = await Lemmy.communities(.local)
+
+var debugCommunity: Community?
+for community in communities {
+    print("Community found: \(community.name)")
+    if community.name == "debug" {
+        debugCommunity = community
+    }
+}
+
+guard let debugCommunity else {
+    fatalError("Debug community not found")
+}
+
+//Getting posts for a specific community
+let posts = await Lemmy.posts(debugCommunity)
+
+for post in posts {
+    print("Post found: \(post.name)")
+}
+
+//Getting comments from a post
+let comments = await Lemmy.comments(posts.first)
+
+for comment in comments {
+    print("Comment found: \(comment.content)")
+}
