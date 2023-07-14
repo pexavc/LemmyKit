@@ -41,3 +41,21 @@ public struct PostView: Codable, Hashable {
 		self.unread_comments = unread_comments
 	}
 }
+
+public extension PostView {
+    static var mock: PostView {
+        .init(
+            post: .mock,
+            creator: .mock,
+            community: .mock,
+            creator_banned_from_community: false,
+            counts: .mock,
+            subscribed: .notSubscribed,
+            saved: false,
+            read: false,
+            creator_blocked: false,
+            my_vote: 0,
+            unread_comments: 0
+        )
+    }
+}

@@ -22,7 +22,7 @@ For an online doc to reference the API supported please visit this [link](https:
 ```swift
 import LemmyKit
 
-let baseUrl: String = "https://neatia.xyz/api/"+LemmyKit.VERSION
+let baseUrl: String = "https://neatia.xyz
 
 let lemmy = Lemmy(apiUrl: baseUrl)
 
@@ -161,10 +161,10 @@ func createComment(_ content: String,
 ```
 
 
-### Other
+## Other
 
 ---
 
-#### Why
+### Why
 
 I spun up a Lemmy instance to function as a content aggregator for my personal applications. While investigating iOS/macOS solutions I deemed it necessary to spin up my own implementation to interact with the lemmy instance as well as open-source it for others.

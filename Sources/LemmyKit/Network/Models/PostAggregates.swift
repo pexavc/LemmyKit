@@ -47,3 +47,23 @@ public struct PostAggregates: Codable, Identifiable, Hashable {
 		self.hot_rank_active = hot_rank_active
 	}
 }
+
+public extension PostAggregates {
+    static var mock: PostAggregates {
+        .init(
+            id: 0,
+            post_id: 12,
+            comments: 0,
+            score: 12,
+            upvotes: 12,
+            downvotes: 12,
+            published: "\(Date())",
+            newest_comment_time_necro: "\(Date())",
+            newest_comment_time: "\(Date())",
+            featured_community: false,
+            featured_local: false,
+            hot_rank: 12,
+            hot_rank_active: 16
+        )
+    }
+}

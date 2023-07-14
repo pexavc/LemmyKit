@@ -62,3 +62,28 @@ public struct Community: Codable, Identifiable, Hashable {
 		self.instance_id = instance_id
 	}
 }
+
+public extension Community {
+    static var mock: Community {
+        .init(
+            id: 0,
+            name: "mockcommunity",
+            title: "Mock Community",
+            description: "Lorem Ipsum",
+            removed: false,
+            published: "\(Date())",
+            updated: nil,
+            deleted: false,
+            nsfw: false,
+            actor_id: "",
+            local: false,
+            icon: "https://media.tpt.cloud/nextavenue/uploads/2021/09/bobrossestate-01.jpg",
+            banner: nil,
+            followers_url: nil,
+            inbox_url: nil,
+            hidden: false,
+            posting_restricted_to_mods: false,
+            instance_id: 0
+        )
+    }
+}

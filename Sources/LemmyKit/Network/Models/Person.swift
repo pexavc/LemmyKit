@@ -62,3 +62,28 @@ public struct Person: Codable, Identifiable, Hashable {
 		self.instance_id = instance_id
 	}
 }
+
+public extension Person {
+    static var mock: Person {
+        .init(
+            id: 0,
+            name: "J. Doe",
+            display_name: nil,
+            avatar: nil,
+            banned: false,
+            published: "\(Date())",
+            updated: nil,
+            actor_id: "",
+            bio: "This is a bio",
+            local: true,
+            banner: nil,
+            deleted: false,
+            inbox_url: nil,
+            matrix_user_id: nil,
+            admin: false,
+            bot_account: false,
+            ban_expires: nil,
+            instance_id: 0
+        )
+    }
+}

@@ -78,7 +78,7 @@ public extension Lemmy {
 public extension Lemmy {
     
     func communities(_ type: ListingType = .local,
-                     auth: String? = nil) async -> [Community] {
+                     auth: String? = nil) async -> [CommunityView] {
         guard let result = try? await api.request(
             ListCommunities(type_: .local,
                             auth: auth ?? self.auth)
@@ -86,18 +86,41 @@ public extension Lemmy {
             return []
         }
         
-        return result.communities.map { $0.community }
+        return result.communities
     }
     static func communities(_ type: ListingType = .local,
-                            auth: String? = nil) async -> [Community] {
+                            auth: String? = nil) async -> [CommunityView] {
         guard let shared else { return [] }
         
         return await shared.communities(type, auth: auth)
     }
     
+    func community(_ id: CommunityId? = nil,
+                   name: String? = nil,
+                   auth: String? = nil) async -> CommunityView? {
+        guard let result = try? await api.request(
+            GetCommunity(id: id,
+                         name: name,
+                         auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result.community_view
+    }
+    static func community(_ id: CommunityId? = nil,
+                          name: String? = nil,
+                          auth: String? = nil) async -> CommunityView? {
+        guard let shared else { return nil }
+        
+        return await shared.community(id,
+                                      name: name,
+                                      auth: auth ?? shared.auth)
+    }
+    
     func post(_ postId: PostId? = nil,
               comment: Comment? = nil,
-              auth: String? = nil) async -> Post? {
+              auth: String? = nil) async -> PostView? {
         guard let result = try? await api.request(
             GetPost(id: postId,
                     comment_id: comment?.id,
@@ -106,36 +129,45 @@ public extension Lemmy {
             return nil
         }
         
-        return result.post_view.post
+        return result.post_view
     }
     static func post(_ postId: PostId? = nil,
                      comment: Comment? = nil,
-                     auth: String? = nil) async -> Post? {
+                     auth: String? = nil) async -> PostView? {
         guard let shared else { return nil }
         
         return await shared.post(postId, comment: comment, auth: auth)
     }
     
-    func posts(_ community: Community,
+    func posts(_ community: Community? = nil,
                type: ListingType = .local,
-               auth: String? = nil) async -> [Post] {
+               page: Int? = nil,
+               limit: Int? = nil,
+               sort: SortType? = nil,
+               auth: String? = nil) async -> [PostView] {
         guard let result = try? await api.request(
             GetPosts(type_: type,
-                     community_id: community.id,
-                     community_name: community.name,
+                     sort: sort,
+                     page: page,
+                     limit: limit,
+                     community_id: community?.id,
+                     community_name: community?.name,
                      auth: auth ?? self.auth)
         ).async() else {
             return []
         }
         
-        return result.posts.map { $0.post }
+        return result.posts
     }
-    static func posts(_ community: Community,
+    static func posts(_ community: Community? = nil,
                       type: ListingType = .local,
-                      auth: String? = nil) async -> [Post] {
+                      page: Int? = nil,
+                      limit: Int? = nil,
+                      sort: SortType? = nil,
+                      auth: String? = nil) async -> [PostView] {
         guard let shared else { return [] }
         
-        return await shared.posts(community, type: type, auth: auth)
+        return await shared.posts(community, type: type, page: page, limit: limit, sort: sort, auth: auth)
     }
     
     /*
@@ -145,7 +177,7 @@ public extension Lemmy {
                   comment: Comment? = nil,
                   community: Community? = nil,
                   type: ListingType = .local,
-                  auth: String? = nil) async -> [Comment] {
+                  auth: String? = nil) async -> [CommentView] {
         guard post != nil || comment != nil || community != nil else {
             LemmyLog("Please provide a post, comment, or communit reference")
             return []
@@ -162,13 +194,13 @@ public extension Lemmy {
             return []
         }
         
-        return result.comments.map { $0.comment }
+        return result.comments
     }
     static func comments(_ post: Post? = nil,
                          comment: Comment? = nil,
                          community: Community? = nil,
                          type: ListingType = .local,
-                         auth: String? = nil) async -> [Comment] {
+                         auth: String? = nil) async -> [CommentView] {
         guard let shared else { return [] }
         
         return await shared.comments(post,

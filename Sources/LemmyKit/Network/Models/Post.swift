@@ -71,3 +71,31 @@ public struct Post: Codable, Identifiable, Hashable {
 		self.featured_local = featured_local
 	}
 }
+
+public extension Post {
+    static var mock: Post {
+        .init(
+            id: 0,
+            name: "Mock Post",
+            url: "https://google.com",
+            body: "Lorem ipsum",
+            creator_id: 12,
+            community_id: 12,
+            removed: false,
+            locked: false,
+            published: "\(Date())",
+            updated: nil,
+            deleted: false,
+            nsfw: false,
+            embed_title: nil,
+            embed_description: nil,
+            thumbnail_url: "https://static01.nyt.com/images/2019/07/13/arts/13video/bob-ross-cover-superJumbo-v2.png",
+            ap_id: "",
+            local: true,
+            embed_video_url: nil,
+            language_id: 0,
+            featured_community: false,
+            featured_local: false
+        )
+    }
+}

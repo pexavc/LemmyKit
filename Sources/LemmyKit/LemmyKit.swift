@@ -16,6 +16,7 @@ public class LemmyKit {
         set {
             let host: String
             
+            #if os(macOS)
             if #available(macOS 13.0, *),
                let sanitized = URL(string: newValue)?.host(percentEncoded: false) {
                 host = sanitized
@@ -24,8 +25,18 @@ public class LemmyKit {
             } else {
                 return
             }
+            #else
+            if #available(iOS 16.0, *),
+               let sanitized = URL(string: newValue)?.host(percentEncoded: false) {
+                host = sanitized
+            } else if let sanitized = URL(string: newValue)?.host {
+                host = sanitized
+            } else {
+                return
+            }
+            #endif
             
-            _baseUrl = "https://" + host + "/api/" + VERSION
+            _baseUrl = "https://" + host + "/api/" + Version
             current = .init(apiUrl: _baseUrl)
         }
     }
@@ -42,7 +53,7 @@ public class LemmyKit {
         }
     }
     
-    public static var VERSION: String = "v3"
+    public static var Version: String = "v3"
     
     public static var logLevel: LemmyLogLevel = .debug
 }
