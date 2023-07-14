@@ -176,7 +176,9 @@ public extension Lemmy {
     func comments(_ post: Post? = nil,
                   comment: Comment? = nil,
                   community: Community? = nil,
+                  depth: Int = 1,
                   type: ListingType = .local,
+                  sort: CommentSortType = .hot,
                   auth: String? = nil) async -> [CommentView] {
         guard post != nil || comment != nil || community != nil else {
             LemmyLog("Please provide a post, comment, or communit reference")
@@ -185,6 +187,8 @@ public extension Lemmy {
         
         guard let result = try? await api.request(
             GetComments(type_: type,
+                        sort: sort,
+                        max_depth: depth,
                         community_id: community?.id,
                         community_name: community?.name,
                         post_id: post?.id,
@@ -199,14 +203,18 @@ public extension Lemmy {
     static func comments(_ post: Post? = nil,
                          comment: Comment? = nil,
                          community: Community? = nil,
+                         depth: Int = 1,
                          type: ListingType = .local,
+                         sort: CommentSortType = .hot,
                          auth: String? = nil) async -> [CommentView] {
         guard let shared else { return [] }
         
         return await shared.comments(post,
                                      comment: comment,
                                      community: community,
+                                     depth: depth,
                                      type: type,
+                                     sort: sort,
                                      auth: auth)
     }
 }
