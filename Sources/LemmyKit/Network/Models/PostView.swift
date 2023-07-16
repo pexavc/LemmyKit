@@ -3,8 +3,8 @@
 import Foundation
 
 public struct PostView: Codable, Hashable {
-	public let post: Post
-	public let creator: Person
+	public var post: Post
+	public var creator: Person
 	public let community: Community
 	public let creator_banned_from_community: Bool
 	public let counts: PostAggregates
@@ -40,6 +40,11 @@ public struct PostView: Codable, Hashable {
 		self.my_vote = my_vote
 		self.unread_comments = unread_comments
 	}
+    
+    mutating func isLocal(_ state: Bool) {
+        post.local = state
+        creator.local = state
+    }
 }
 
 public extension PostView {

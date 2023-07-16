@@ -14,33 +14,16 @@ public class LemmyKit {
             return _baseUrl
         }
         set {
-            let host: String
+            let sanitizedValue = sanitize(newValue)
             
-            #if os(macOS)
-            if #available(macOS 13.0, *),
-               let sanitized = URL(string: newValue)?.host(percentEncoded: false) {
-                host = sanitized
-            } else if let sanitized = URL(string: newValue)?.host {
-                host = sanitized
-            } else {
-                return
-            }
-            #else
-            if #available(iOS 16.0, *),
-               let sanitized = URL(string: newValue)?.host(percentEncoded: false) {
-                host = sanitized
-            } else if let sanitized = URL(string: newValue)?.host {
-                host = sanitized
-            } else {
-                return
-            }
-            #endif
-            
-            _baseUrl = "https://" + host + "/api/" + Version
-            current = .init(apiUrl: _baseUrl)
+            self.host = sanitizedValue.host ?? ""
+            _baseUrl = sanitizedValue.apiUrl ?? ""
+            current = .init(apiUrl: _baseUrl, base: true)
         }
     }
     static var _baseUrl: String = ""
+    
+    public static var host: String = ""
     
     public static var current: Lemmy?
     
@@ -56,4 +39,32 @@ public class LemmyKit {
     public static var Version: String = "v3"
     
     public static var logLevel: LemmyLogLevel = .debug
+    
+    static func sanitize(_ base: String) -> (host: String?, apiUrl: String?) {
+        var value: String = (base.contains("http") ? "" : "https://") + base
+        
+        let host: String
+        
+        #if os(macOS)
+        if #available(macOS 13.0, *),
+           let sanitized = URL(string: value)?.host(percentEncoded: false) {
+            host = sanitized
+        } else if let sanitized = URL(string: value)?.host {
+            host = sanitized
+        } else {
+            return (nil, nil)
+        }
+        #else
+        if #available(iOS 16.0, *),
+           let sanitized = URL(string: value)?.host(percentEncoded: false) {
+            host = sanitized
+        } else if let sanitized = URL(string: value)?.host {
+            host = sanitized
+        } else {
+            return (nil, nil)
+        }
+        #endif
+        
+        return (host, "https://" + host + "/api/" + Version)
+    }
 }

@@ -12,7 +12,7 @@ public struct Person: Codable, Identifiable, Hashable {
 	public let updated: String?
 	public let actor_id: String
 	public let bio: String?
-	public let local: Bool
+	public var local: Bool
 	public let banner: String?
 	public let deleted: Bool
 	public let inbox_url: String?

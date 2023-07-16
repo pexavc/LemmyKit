@@ -3,9 +3,9 @@
 import Foundation
 
 public struct CommentView: Codable, Hashable {
-	public let comment: Comment
-	public let creator: Person
-	public let post: Post
+	public var comment: Comment
+	public var creator: Person
+	public var post: Post
 	public let community: Community
 	public let counts: CommentAggregates
 	public let creator_banned_from_community: Bool
@@ -37,4 +37,10 @@ public struct CommentView: Codable, Hashable {
 		self.creator_blocked = creator_blocked
 		self.my_vote = my_vote
 	}
+    
+    mutating func isLocal(_ state: Bool) {
+        comment.local = state
+        creator.local = state
+        post.local = state
+    }
 }

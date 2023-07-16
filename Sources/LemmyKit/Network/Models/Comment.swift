@@ -12,7 +12,7 @@ public struct Comment: Codable, Identifiable, Hashable {
 	public let updated: String?
 	public let deleted: Bool
 	public let ap_id: String
-	public let local: Bool
+	public var local: Bool
 	public let path: String
 	public let distinguished: Bool
 	public let language_id: LanguageId
