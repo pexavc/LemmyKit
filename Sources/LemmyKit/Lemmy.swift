@@ -327,6 +327,8 @@ public extension Lemmy {
                   comment: Comment? = nil,
                   community: Community? = nil,
                   depth: Int = 1,
+                  page: Int? = nil,
+                  limit: Int? = nil,
                   type: ListingType = .local,
                   sort: CommentSortType = .hot,
                   auth: String? = nil,
@@ -340,6 +342,8 @@ public extension Lemmy {
             GetComments(type_: type,
                         sort: sort,
                         max_depth: depth,
+                        page: page,
+                        limit: limit,
                         //id can conflict if an instanced server is requested with base Lemmy client. Since the community ids could be different
                         //community_id: community?.id,
                         community_name: community?.name,
@@ -360,6 +364,8 @@ public extension Lemmy {
                          comment: Comment? = nil,
                          community: Community? = nil,//required to get instanced community incase
                          depth: Int = 1,
+                         page: Int? = nil,
+                         limit: Int? = nil,
                          type: ListingType = .local,
                          sort: CommentSortType = .hot,
                          auth: String? = nil) async -> [CommentView] {
@@ -374,6 +380,8 @@ public extension Lemmy {
                                                  comment: comment,
                                                  community: community,
                                                  depth: depth,
+                                                 page: page,
+                                                 limit: limit,
                                                  type: type,
                                                  sort: sort,
                                                  auth: auth,
@@ -384,6 +392,8 @@ public extension Lemmy {
                                          comment: comment,
                                          community: community,
                                          depth: depth,
+                                         page: page,
+                                         limit: limit,
                                          type: type,
                                          sort: sort,
                                          auth: auth)

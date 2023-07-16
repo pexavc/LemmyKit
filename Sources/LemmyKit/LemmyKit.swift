@@ -45,8 +45,7 @@ public class LemmyKit {
         
         let host: String
         
-        #if os(macOS)
-        if #available(macOS 13.0, *),
+        if #available(macOS 13.0, iOS 16.0, *),
            let sanitized = URL(string: value)?.host(percentEncoded: false) {
             host = sanitized
         } else if let sanitized = URL(string: value)?.host {
@@ -54,16 +53,6 @@ public class LemmyKit {
         } else {
             return (nil, nil)
         }
-        #else
-        if #available(iOS 16.0, *),
-           let sanitized = URL(string: value)?.host(percentEncoded: false) {
-            host = sanitized
-        } else if let sanitized = URL(string: value)?.host {
-            host = sanitized
-        } else {
-            return (nil, nil)
-        }
-        #endif
         
         return (host, "https://" + host + "/api/" + Version)
     }
