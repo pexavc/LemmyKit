@@ -31,27 +31,29 @@ public struct Markdown: ViewRepresentable {
     }
     private func getWebView(context: Context) -> MarkdownWebView {
         let codeView = MarkdownWebView()
+        codeView.style = style
+        codeView.theme = colorScheme == .dark ? .dark : .light
         codeView.setContent(content)
-        if (style.padding != nil) {
-            codeView.setPadding(style.padding!)
-        }
-        if (style.paddingTop != nil) {
-            codeView.setPaddingTop(style.paddingTop!)
-        }
-        if (style.paddingBottom != nil) {
-            codeView.setPaddingBottom(style.paddingBottom!)
-        }
-        if (style.paddingLeft != nil) {
-            codeView.setPaddingLeft(style.paddingLeft!)
-        }
-        if (style.paddingRight != nil) {
-            codeView.setPaddingRight(style.paddingRight!)
-        }
-        codeView.setSize(style.size)
+//        if (style.padding != nil) {
+//            codeView.setPadding(style.padding!)
+//        }
+//        if (style.paddingTop != nil) {
+//            codeView.setPaddingTop(style.paddingTop!)
+//        }
+//        if (style.paddingBottom != nil) {
+//            codeView.setPaddingBottom(style.paddingBottom!)
+//        }
+//        if (style.paddingLeft != nil) {
+//            codeView.setPaddingLeft(style.paddingLeft!)
+//        }
+//        if (style.paddingRight != nil) {
+//            codeView.setPaddingRight(style.paddingRight!)
+//        }
+//        codeView.setSize(style.size)
         codeView.textDidChanged = { text in
             context.coordinator.set(content: text)
         }
-        colorScheme == .dark ? codeView.setTheme(.dark) : codeView.setTheme(.light)
+//        colorScheme == .dark ? codeView.setTheme(.dark) : codeView.setTheme(.light)
         return codeView
     }
     
@@ -61,7 +63,9 @@ public struct Markdown: ViewRepresentable {
             context.coordinator.set(colorScheme: colorScheme)
         }
         if context.coordinator.content != content {
-            webview.setContent(content)
+            DispatchQueue.main.async {
+                webview.setContent(content)
+            }
         }
     }
     // MARK: macOS

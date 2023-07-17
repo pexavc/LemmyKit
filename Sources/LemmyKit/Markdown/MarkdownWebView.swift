@@ -29,6 +29,15 @@ private struct JavascriptFunction {
     }
 }
 
+class MarkdownWebViewOperation {
+    static var shared: MarkdownWebViewOperation = .init()
+    var queue: OperationQueue = .init()
+    init() {
+        queue.underlyingQueue = .main
+        queue.maxConcurrentOperationCount = 1
+    }
+}
+
 public class MarkdownWebView: CustomView, WKNavigationDelegate {
     @Environment(\.openURL) private var openURL
     private struct Constants {
@@ -60,20 +69,52 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
     private var pageLoaded = false
     private var currentContent: String = ""
     private var pendingFunctions = [JavascriptFunction]()
-    
+    public var style: MarkdownStyle? = nil
+    public var theme: ColorScheme = .dark
     
     override init(frame frameRect: CGRect) {
         super.init(frame: frameRect)
-        initWebView()
+        MarkdownWebViewOperation.shared.queue.addOperation { [weak self] in
+            self?.initWebView()
+            self?.styleWebView()
+        }
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        initWebView()
+        MarkdownWebViewOperation.shared.queue.addOperation { [weak self] in
+            self?.initWebView()
+            self?.styleWebView()
+        }
+    }
+    
+    func styleWebView() {
+        guard let style else { return }
+        if (style.padding != nil) {
+            setPadding(style.padding!)
+        }
+        if (style.paddingTop != nil) {
+            setPaddingTop(style.paddingTop!)
+        }
+        if (style.paddingBottom != nil) {
+            setPaddingBottom(style.paddingBottom!)
+        }
+        if (style.paddingLeft != nil) {
+            setPaddingLeft(style.paddingLeft!)
+        }
+        if (style.paddingRight != nil) {
+            setPaddingRight(style.paddingRight!)
+        }
+        setSize(style.size)
     }
     
     func setContent(_ value: String) {
-        
+        MarkdownWebViewOperation.shared.queue.addOperation { [weak self] in
+            self?._setContent(value)
+        }
+    }
+    
+    private func _setContent(_ value: String) {
         guard currentContent != value else {
             return
         }
@@ -95,8 +136,8 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
 
         let script = first + content + end
         callJavascript(javascriptString: script)
-        
     }
+    
     func setTheme(_ theme: ColorScheme) {
         if theme == .dark {
             callJavascript(javascriptString: "document.body.classList.add('theme-dark');")
@@ -157,7 +198,9 @@ extension MarkdownWebView {
                 fatalError("Ace editor is missing")
         }
         
-        let data = try! Data(contentsOf: URL(fileURLWithPath: indexPath))
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: indexPath)) else {
+            return
+        }
         webview.load(data, mimeType: "text/html", characterEncodingName: "utf-8", baseURL: bundle.resourceURL!)
     }
     private func addFunction(function: JavascriptFunction) {

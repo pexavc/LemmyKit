@@ -125,13 +125,13 @@ public class Lemmy {
         return await shared.pictrs(request)
     }
     
-    public static func getInstancedDomain(community: Community) -> String? {
-        
+    public static func getInstancedDomain(community: Community, instanceId: Int? = nil) -> String? {
+        var id: Int = instanceId ?? community.instance_id
         var instancedDomain: String? = nil
         
-        if let allowedInstance = Lemmy.allowedInstances[community.instance_id] {
+        if let allowedInstance = Lemmy.allowedInstances[id] {
             instancedDomain = allowedInstance.domain
-        } else if let linkedInstance = Lemmy.linkedInstances[community.instance_id] {
+        } else if let linkedInstance = Lemmy.linkedInstances[id] {
             instancedDomain = linkedInstance.domain
         }
         
@@ -299,7 +299,7 @@ public extension Lemmy {
         
         //Fetch federated community
         if let community,
-           let domain = getInstancedDomain(community: community) {
+           let domain = LemmyKit.sanitize(community.actor_id).host { //getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
             return await instancedLemmy.posts(community,
@@ -373,7 +373,7 @@ public extension Lemmy {
         
         //Fetch federated comments, won't work if only comment is passed in
         if let community,
-           let domain = getInstancedDomain(community: community) {
+           let domain = LemmyKit.sanitize(community.actor_id).host {//getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
             return await instancedLemmy.comments(post,
