@@ -44,6 +44,7 @@ public class Lemmy {
     public static var emojis: [CustomEmojiView] = []
     public static var stats: SiteAggregates? = nil
     public static var metadata: Metadata? = nil
+    public static var user: MyUserInfo? = nil
     
     private var isBaseInstance: Bool
     
@@ -58,10 +59,6 @@ public class Lemmy {
         self.api = .init(urlString.apiUrl ?? apiUrl)
         self.pictrs = .init(pictrsUrl ?? (urlString.apiUrl ?? apiUrl) + "/pictrs/image")
         self.isBaseInstance = base
-        
-        if base {
-            Lemmy.getSite()
-        }
     }
     
     public static func getSite() {
@@ -69,17 +66,22 @@ public class Lemmy {
         Lemmy.getSiteTask = Task {
             let site = await Lemmy.site()
             
-            Lemmy.instanceId = site?.site_view.site.instance_id
-            Lemmy.admins = site?.admins ?? []
-            Lemmy.emojis = site?.custom_emojis ?? []
-            Lemmy.stats = site?.site_view.counts
-            if let view = site?.site_view {
-                Lemmy.metadata = .init(siteView: view)
-            }
-            
-            Lemmy.getSiteTask = nil
-            Lemmy.siteLoaded = true
+            Lemmy.update(site: site)
         }
+    }
+    
+    private static func update(site: GetSiteResponse?) {
+        Lemmy.instanceId = site?.site_view.site.instance_id
+        Lemmy.admins = site?.admins ?? []
+        Lemmy.emojis = site?.custom_emojis ?? []
+        Lemmy.stats = site?.site_view.counts
+        Lemmy.user = site?.my_user
+        if let view = site?.site_view {
+            Lemmy.metadata = .init(siteView: view)
+        }
+        
+        Lemmy.getSiteTask = nil
+        Lemmy.siteLoaded = true
     }
     
     public static func getInstances() async {
@@ -142,20 +144,58 @@ public class Lemmy {
 //MARK: -- Auth/Registration
 
 public extension Lemmy {
-    func login(username: String, password: String) async -> String? {
+    func login(username: String, password: String, token2FA: String? = nil) async -> String? {
         guard let result = try? await api.request(
             Login(username_or_email: username,
-                  password: password)
+                  password: password,
+                  totp_2fa_token: token2FA)
         ).async() else {
             return nil
         }
         
+        if isBaseInstance {
+            LemmyKit.auth = result.jwt
+            
+            //Update user info
+            _ = await Lemmy.site(auth: result.jwt)
+        }
+        
         return result.jwt
     }
-    static func login(username: String, password: String) async -> String? {
+    static func login(username: String, password: String, token2FA: String? = nil) async -> String? {
         guard let shared else { return nil }
         
-        return await shared.login(username: username, password: password)
+        return await shared.login(username: username, password: password, token2FA: token2FA)
+    }
+}
+
+//MARK: -- User info
+
+public extension Lemmy {
+    func user(_ person_id: PersonId? = nil,
+              username: String? = nil,
+              sort: SortType? = nil,
+              auth: String? = nil) async -> GetPersonDetailsResponse? {
+        guard let result = try? await api.request(
+            GetPersonDetails(person_id: person_id,
+                             username: username,
+                             sort: sort,
+                             auth: auth ?? self.auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func user(_ person_id: PersonId? = nil,
+                     username: String? = nil,
+                     sort: SortType? = nil,
+                     auth: String? = nil) async -> GetPersonDetailsResponse? {
+        
+        return await shared?.user(person_id,
+                                  username: username,
+                                  sort: sort,
+                                  auth: auth)
     }
 }
 
@@ -167,6 +207,10 @@ public extension Lemmy {
             GetSite(auth: auth ?? self.auth)
         ).async() else {
             return nil
+        }
+        
+        if isBaseInstance {
+            Lemmy.update(site: result)
         }
         
         return result
