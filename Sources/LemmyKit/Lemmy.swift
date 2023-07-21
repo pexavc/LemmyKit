@@ -445,6 +445,63 @@ public extension Lemmy {
     }
 }
 
+//MARK: -- Interact
+
+public extension Lemmy {
+    func upvotePost(_ post: Post,
+                    score: Int,
+                    auth: String? = nil) async -> PostView? {
+        guard let auth = auth ?? self.auth else {
+            return nil
+        }
+        
+        guard let result = try? await api.request(
+            CreatePostLike(post_id: post.id,
+                           score: score,
+                           auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result.post_view
+    }
+    static func upvotePost(_ post: Post,
+                           score: Int,
+                           auth: String? = nil) async -> PostView? {
+        guard let shared else { return nil }
+        
+        return await shared.upvotePost(post,
+                                       score: score,
+                                       auth: auth)
+    }
+    
+    func upvoteComment(_ comment: Comment,
+                       score: Int,
+                       auth: String? = nil) async -> CommentView? {
+        guard let auth = auth ?? self.auth else {
+            return nil
+        }
+        guard let result = try? await api.request(
+            CreateCommentLike(comment_id: comment.id,
+                              score: score,
+                              auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result.comment_view
+    }
+    static func upvoteComment(_ comment: Comment,
+                              score: Int,
+                              auth: String? = nil) async -> CommentView? {
+        guard let shared else { return nil }
+        
+        return await shared.upvoteComment(comment,
+                                          score: score,
+                                          auth: auth)
+    }
+}
+
 //MARK: -- Create
 
 public extension Lemmy {
