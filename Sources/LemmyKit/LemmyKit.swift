@@ -41,7 +41,7 @@ public class LemmyKit {
     public static var logLevel: LemmyLogLevel = .debug
     
     static func sanitize(_ base: String) -> (host: String?, apiUrl: String?) {
-        var value: String = (base.contains("http") ? "" : "https://") + base
+        let value: String = (base.contains("http") ? "" : "https://") + base
         
         let host: String
         

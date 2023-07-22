@@ -22,7 +22,7 @@ For an online doc to reference the API supported please visit this [link](https:
 ```swift
 import LemmyKit
 
-let baseUrl: String = "https://neatia.xyz
+let baseUrl: String = "https://neatia.xyz"
 
 let lemmy = Lemmy(apiUrl: baseUrl)
 

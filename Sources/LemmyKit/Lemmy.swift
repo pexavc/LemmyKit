@@ -76,6 +76,7 @@ public class Lemmy {
         Lemmy.emojis = site?.custom_emojis ?? []
         Lemmy.stats = site?.site_view.counts
         Lemmy.user = site?.my_user
+        print("[LemmyKit] Setting session user: \(site?.my_user?.local_user_view.person.name), from: \(site?.my_user?.local_user_view.person.actor_id)")
         if let view = site?.site_view {
             Lemmy.metadata = .init(siteView: view)
         }
