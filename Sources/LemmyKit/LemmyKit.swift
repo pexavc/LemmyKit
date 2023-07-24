@@ -25,7 +25,7 @@ public class LemmyKit {
     
     public static var host: String = ""
     
-    public static var current: Lemmy?
+    public static var current: Lemmy = .init(apiUrl: "")
     
     public static var auth: String? {
         get {
@@ -39,6 +39,7 @@ public class LemmyKit {
     public static var Version: String = "v3"
     
     public static var logLevel: LemmyLogLevel = .debug
+    
     
     static func sanitize(_ base: String) -> (host: String?, apiUrl: String?) {
         let value: String = (base.contains("http") ? "" : "https://") + base

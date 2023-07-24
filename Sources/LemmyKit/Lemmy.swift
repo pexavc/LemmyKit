@@ -24,27 +24,27 @@ public class Lemmy {
     
     public var auth: String? = nil
     
-    public static var allInstances: [InstanceId:Instance] = [:]
-    public static var allowedInstances: [InstanceId:Instance] = [:]
-    public static var linkedInstances: [InstanceId:Instance] = [:]
-    public static var blockedInstances: [InstanceId:Instance] = [:]
-    public static var instancesLoaded: Bool = false
+    public var allInstances: [InstanceId:Instance] = [:]
+    public var allowedInstances: [InstanceId:Instance] = [:]
+    public var linkedInstances: [InstanceId:Instance] = [:]
+    public var blockedInstances: [InstanceId:Instance] = [:]
+    public var instancesLoaded: Bool = false
     
-    public static var communities: [CommunityId:CommunityView] = [:]
+    public var communities: [CommunityId:CommunityView] = [:]
     
     private var api: Network
     private var pictrs: Network
     
-    public static var getSiteTask: Task<Void, Error>? = nil
-    public static var siteLoaded: Bool = false
+    public var getSiteTask: Task<Void, Error>? = nil
+    public var siteLoaded: Bool = false
     
     //assigned during getSite() call
-    public static var instanceId: InstanceId? = nil
-    public static var admins: [PersonView] = []
-    public static var emojis: [CustomEmojiView] = []
-    public static var stats: SiteAggregates? = nil
-    public static var metadata: Metadata? = nil
-    public static var user: MyUserInfo? = nil
+    public var instanceId: InstanceId? = nil
+    public var admins: [PersonView] = []
+    public var emojis: [CustomEmojiView] = []
+    public var stats: SiteAggregates? = nil
+    public var metadata: Metadata? = nil
+    public var user: MyUserInfo? = nil
     
     private var isBaseInstance: Bool
     
@@ -61,31 +61,34 @@ public class Lemmy {
         self.isBaseInstance = base
     }
     
-    public static func getSite() {
-        Lemmy.getSiteTask?.cancel()
-        Lemmy.getSiteTask = Task {
+    public func getSite() {
+        getSiteTask?.cancel()
+        getSiteTask = Task {
             let site = await Lemmy.site()
             
-            Lemmy.update(site: site)
+            update(site: site)
         }
     }
+    public static func getSite() {
+        shared?.getSite()
+    }
     
-    private static func update(site: GetSiteResponse?) {
-        Lemmy.instanceId = site?.site_view.site.instance_id
-        Lemmy.admins = site?.admins ?? []
-        Lemmy.emojis = site?.custom_emojis ?? []
-        Lemmy.stats = site?.site_view.counts
-        Lemmy.user = site?.my_user
+    private func update(site: GetSiteResponse?) {
+        instanceId = site?.site_view.site.instance_id
+        admins = site?.admins ?? []
+        emojis = site?.custom_emojis ?? []
+        stats = site?.site_view.counts
+        user = site?.my_user
         print("[LemmyKit] Setting session user: \(site?.my_user?.local_user_view.person.name), from: \(site?.my_user?.local_user_view.person.actor_id)")
         if let view = site?.site_view {
-            Lemmy.metadata = .init(siteView: view)
+            metadata = .init(siteView: view)
         }
         
-        Lemmy.getSiteTask = nil
-        Lemmy.siteLoaded = true
+        getSiteTask = nil
+        siteLoaded = true
     }
     
-    public static func getInstances() async {
+    public func getInstances() async {
         let instances = await Lemmy.instances()
         
         for instance in instances?.allowed ?? [] {
@@ -103,7 +106,7 @@ public class Lemmy {
             self.allInstances[instance.id] = instance
         }
         
-        Lemmy.instancesLoaded = true
+        instancesLoaded = true
     }
     
     public func request<R: Request>(_ request: R) async -> R.TransformedResponse? {
@@ -128,17 +131,21 @@ public class Lemmy {
         return await shared.pictrs(request)
     }
     
-    public static func getInstancedDomain(community: Community, instanceId: Int? = nil) -> String? {
+    public func getInstancedDomain(community: Community, instanceId: Int? = nil) -> String? {
         var id: Int = instanceId ?? community.instance_id
         var instancedDomain: String? = nil
         
-        if let allowedInstance = Lemmy.allowedInstances[id] {
+        if let allowedInstance = allowedInstances[id] {
             instancedDomain = allowedInstance.domain
-        } else if let linkedInstance = Lemmy.linkedInstances[id] {
+        } else if let linkedInstance = linkedInstances[id] {
             instancedDomain = linkedInstance.domain
         }
         
         return instancedDomain
+    }
+    
+    public static func getInstancedDomain(community: Community, instanceId: Int? = nil) -> String? {
+        shared?.getInstancedDomain(community: community, instanceId: instanceId)
     }
 }
 
@@ -210,9 +217,7 @@ public extension Lemmy {
             return nil
         }
         
-        if isBaseInstance {
-            Lemmy.update(site: result)
-        }
+        update(site: result)
         
         return result
     }
