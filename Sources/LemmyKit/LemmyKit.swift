@@ -46,10 +46,11 @@ public class LemmyKit {
         
         let host: String
         
-        if #available(macOS 13.0, iOS 16.0, *),
+        //TODO: odd malloc issue
+        /*if #available(macOS 13.0, iOS 16.0, *),
            let sanitized = URL(string: value)?.host(percentEncoded: false) {
             host = sanitized
-        } else if let sanitized = URL(string: value)?.host {
+        } else */if let sanitized = URL(string: value)?.host {
             host = sanitized
         } else {
             return (nil, nil)

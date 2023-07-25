@@ -166,6 +166,9 @@ public extension Lemmy {
             
             //Update user info
             _ = await Lemmy.site(auth: result.jwt)
+        } else {
+            self.auth = result.jwt
+            await site(auth: result.jwt)
         }
         
         return result.jwt
@@ -243,10 +246,17 @@ public extension Lemmy {
     }
     
     func communities(_ type: ListingType = .local,
+                     sort: SortType? = nil,
+                     page: Int? = nil,
+                     limit: Int? = nil,
                      auth: String? = nil) async -> [CommunityView] {
         guard let result = try? await api.request(
-            ListCommunities(type_: .local,
+            ListCommunities(type_: type,
+                            sort: sort,
+                            page: page,
+                            limit: limit,
                             auth: auth ?? self.auth)
+            
         ).async() else {
             return []
         }
@@ -254,10 +264,17 @@ public extension Lemmy {
         return result.communities
     }
     static func communities(_ type: ListingType = .local,
+                            sort: SortType? = nil,
+                            page: Int? = nil,
+                            limit: Int? = nil,
                             auth: String? = nil) async -> [CommunityView] {
         guard let shared else { return [] }
         
-        return await shared.communities(type, auth: auth)
+        return await shared.communities(type,
+                                        sort: sort,
+                                        page: page,
+                                        limit: limit,
+                                        auth: auth)
     }
     
     func community(_ id: CommunityId? = nil,
