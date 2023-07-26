@@ -346,6 +346,7 @@ public extension Lemmy {
                      page: page,
                      limit: limit,
                      //id can conflict if an instanced server is requested with base Lemmy client. Since the community ids could be different
+                     //This relates to the useBase flag added in the coupled static call
                      //community_id: community?.id,
                      community_name: community?.name,
                      auth: auth ?? self.auth,
@@ -361,11 +362,17 @@ public extension Lemmy {
                       page: Int? = nil,
                       limit: Int? = nil,
                       sort: SortType? = nil,
-                      auth: String? = nil) async -> [PostView] {
+                      auth: String? = nil,
+                      //TODO: needs revision
+                      useBase: Bool = false) async -> [PostView] {
         guard let shared else { return [] }
         
+        
+        /* Fetching from the community's perspective vs base instance's
+           needs to be thought out */
         //Fetch federated community
-        if let community,
+        if useBase == false,
+           let community,
            let domain = LemmyKit.sanitize(community.actor_id).host { //getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
@@ -391,6 +398,7 @@ public extension Lemmy {
      Comments can be sourced via post, community, or comment. One must be provided.
      */
     func comments(_ post: Post? = nil,
+                  postId: PostId? = nil,
                   comment: Comment? = nil,
                   community: Community? = nil,
                   depth: Int = 1,
@@ -414,7 +422,7 @@ public extension Lemmy {
                         //id can conflict if an instanced server is requested with base Lemmy client. Since the community ids could be different
                         //community_id: community?.id,
                         community_name: community?.name,
-                        post_id: post?.id,
+                        post_id: postId ?? post?.id,
                         parent_id: comment?.id,
                         auth: auth ?? self.auth,
                         isLocal: isLocal)
@@ -442,8 +450,9 @@ public extension Lemmy {
         if let community,
            let domain = LemmyKit.sanitize(community.actor_id).host {//getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
-            
+            let postId: PostId? = PostId(post?.ap_id.components(separatedBy: "/").last ?? "")
             return await instancedLemmy.comments(post,
+                                                 postId: postId,
                                                  comment: comment,
                                                  community: community,
                                                  depth: depth,
