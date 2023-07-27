@@ -752,6 +752,13 @@ public extension Lemmy {
             return nil
         }
         
+        if isBaseInstance {
+            LemmyKit.auth = result.jwt
+            
+            //Update user info
+            _ = await Lemmy.site(auth: result.jwt)
+        }
+        
         return result
     }
     static func saveUserSettings(show_nsfw: Bool? = nil,
@@ -774,10 +781,17 @@ public extension Lemmy {
                                  show_new_post_notifs: Bool? = nil,
                                  discussion_languages: [LanguageId]? = nil,
                                  generate_totp_2fa: Bool? = nil,
-                                 auth: String,
+                                 auth: String? = nil,
                                  open_links_in_new_tab: Bool? = nil
                              ) async -> LoginResponse? {
         guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
         
         return await shared.saveUserSettings(show_nsfw: show_nsfw,
                                              show_scores: show_scores,
@@ -799,7 +813,7 @@ public extension Lemmy {
                                              show_new_post_notifs: show_new_post_notifs,
                                              discussion_languages: discussion_languages,
                                              generate_totp_2fa: generate_totp_2fa,
-                                             auth: auth,
+                                             auth: validAuth,
                                              open_links_in_new_tab: open_links_in_new_tab)
     }
     

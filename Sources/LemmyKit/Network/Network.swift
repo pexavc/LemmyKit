@@ -130,7 +130,7 @@ extension Network {
         }
         
         switch request.method {
-        case .post:
+        case .post, .put:
             if let jsonData = try? JSONSerialization.data(withJSONObject: request.data, options: .prettyPrinted) {
                 urlRequest.httpBody = jsonData
             }
