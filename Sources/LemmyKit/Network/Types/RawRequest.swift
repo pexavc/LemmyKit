@@ -14,11 +14,19 @@ public protocol RawRequest : Encodable {
     var dateFormatter : DateFormatter { get }
     var customHeaders : [String : String] { get }
     var customQueries : [String : String] { get }
+    var multipartData : MultipartFormDataRequest.Model? { get }
 
     func transform(_ publisher : AnyPublisher<Response, Error>) throws -> AnyPublisher<TransformedResponse, Error>
 }
 
 public extension RawRequest {
+    var isMultipartForm: Bool {
+        multipartData != nil
+    }
+    
+    var multipartData: MultipartFormDataRequest.Model? {
+        nil
+    }
     
     var ignoresEndpoint : Bool {
         false

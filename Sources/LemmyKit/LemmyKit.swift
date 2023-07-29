@@ -41,7 +41,7 @@ public class LemmyKit {
     public static var logLevel: LemmyLogLevel = .debug
     
     
-    static func sanitize(_ base: String) -> (host: String?, apiUrl: String?) {
+    static func sanitize(_ base: String) -> (host: String?, baseUrl: String?, apiUrl: String?) {
         let value: String = (base.contains("http") ? "" : "https://") + base
         
         let host: String
@@ -53,9 +53,9 @@ public class LemmyKit {
         } else */if let sanitized = URL(string: value)?.host {
             host = sanitized
         } else {
-            return (nil, nil)
+            return (nil, nil, nil)
         }
         
-        return (host, "https://" + host + "/api/" + Version)
+        return (host, "https://" + host, "https://" + host + "/api/" + Version)
     }
 }

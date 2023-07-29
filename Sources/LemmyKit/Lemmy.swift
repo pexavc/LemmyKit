@@ -57,7 +57,7 @@ public class Lemmy {
         let urlString = LemmyKit.sanitize(apiUrl)
         
         self.api = .init(urlString.apiUrl ?? apiUrl)
-        self.pictrs = .init(pictrsUrl ?? (urlString.apiUrl ?? apiUrl) + "/pictrs/image")
+        self.pictrs = .init(pictrsUrl ?? (urlString.baseUrl ?? apiUrl) + "/pictrs/image")
         self.isBaseInstance = base
     }
     
@@ -211,7 +211,7 @@ public extension Lemmy {
 }
 
 //MARK: -- Fetch
-    
+
 public extension Lemmy {
     func site(auth: String? = nil) async -> GetSiteResponse? {
         guard let result = try? await api.request(
@@ -282,8 +282,8 @@ public extension Lemmy {
                    auth: String? = nil) async -> CommunityView? {
         guard let result = try? await api.request(
             GetCommunity(/*id: id,*/ //id sometimes fails?
-                         name: name,
-                         auth: auth ?? self.auth)
+                name: name,
+                auth: auth ?? self.auth)
         ).async() else {
             return nil
         }
@@ -304,7 +304,7 @@ public extension Lemmy {
             return await instancedLemmy.community(id,
                                                   name: name ?? community.name,
                                                   auth: auth)
-        //Fetch local community
+            //Fetch local community
         } else {
             return await shared.community(id,
                                           name: name ?? community?.name,
@@ -369,7 +369,7 @@ public extension Lemmy {
         
         
         /* Fetching from the community's perspective vs base instance's
-           needs to be thought out */
+         needs to be thought out */
         //Fetch federated community
         if useBase == false,
            let community,
@@ -383,7 +383,7 @@ public extension Lemmy {
                                               sort: sort,
                                               auth: auth ?? shared.auth,
                                               isLocal: false)
-        //Fetch local community
+            //Fetch local community
         } else {
             return await shared.posts(community,
                                       type: type,
@@ -433,7 +433,7 @@ public extension Lemmy {
         return result.comments
     }
     /* Should only use post when viewing comments to resolve against base client
-    post id with a community passed in that is not of the same community id as seen in the base client will not resolve
+     post id with a community passed in that is not of the same community id as seen in the base client will not resolve
      */
     static func comments(_ post: Post? = nil,
                          comment: Comment? = nil,
@@ -462,7 +462,7 @@ public extension Lemmy {
                                                  sort: sort,
                                                  auth: auth,
                                                  isLocal: false)
-        //Fetch local community
+            //Fetch local community
         } else {
             return await shared.comments(post,
                                          comment: comment,
@@ -541,6 +541,36 @@ public extension Lemmy {
                                        auth: validAuth)
     }
     
+    func savePost(_ post: Post,
+                  save: Bool,
+                  auth: String) async -> PostResponse? {
+        guard let result = try? await api.request(
+            SavePost(post_id: post.id,
+                     save: save,
+                     auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func savePost(_ post: Post,
+                         save: Bool,
+                         auth: String? = nil) async -> PostResponse? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.savePost(post,
+                                     save: save,
+                                     auth: validAuth)
+    }
+    
     func upvoteComment(_ comment: Comment,
                        score: Int,
                        auth: String? = nil) async -> CommentView? {
@@ -599,6 +629,35 @@ public extension Lemmy {
                                           removed: removed,
                                           reason: reason,
                                           auth: validAuth)
+    }
+    func saveComment(_ comment: Comment,
+                     save: Bool,
+                     auth: String) async -> CommentResponse? {
+        guard let result = try? await api.request(
+            SaveComment(comment_id: comment.id,
+                        save: save,
+                        auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func saveComment(comment: Comment,
+                            save: Bool,
+                            auth: String? = nil) async -> CommentResponse? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.saveComment(comment,
+                                        save: save,
+                                        auth: validAuth)
     }
 }
 
@@ -792,7 +851,7 @@ public extension Lemmy {
                           generate_totp_2fa: Bool? = nil,
                           auth: String,
                           open_links_in_new_tab: Bool? = nil
-                      ) async -> LoginResponse? {
+    ) async -> LoginResponse? {
         guard let result = try? await api.request(
             SaveUserSettings(show_nsfw: show_nsfw,
                              show_scores: show_scores,
@@ -851,7 +910,7 @@ public extension Lemmy {
                                  generate_totp_2fa: Bool? = nil,
                                  auth: String? = nil,
                                  open_links_in_new_tab: Bool? = nil
-                             ) async -> LoginResponse? {
+    ) async -> LoginResponse? {
         guard let shared else { return nil }
         
         let validAuth: String? = auth ?? shared.auth
@@ -886,12 +945,12 @@ public extension Lemmy {
     }
     
     func details(_ person_id: PersonId? = nil,
-              sort: SortType? = nil,
-              page: Int? = nil,
-              limit: Int? = nil,
-              community_id: CommunityId? = nil,
-              saved_only: Bool? = nil,
-              auth: String? = nil) async -> GetPersonDetailsResponse? {
+                 sort: SortType? = nil,
+                 page: Int? = nil,
+                 limit: Int? = nil,
+                 community_id: CommunityId? = nil,
+                 saved_only: Bool? = nil,
+                 auth: String? = nil) async -> GetPersonDetailsResponse? {
         guard let result = try? await api.request(
             GetPersonDetails(person_id: person_id,
                              sort: sort,
@@ -922,13 +981,13 @@ public extension Lemmy {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
             return await instancedLemmy.details(person?.id,
-                                        sort: sort,
-                                        page: page,
-                                        limit: limit,
-                                        community_id: community.id,
-                                        saved_only: saved_only,
-                                        auth: auth)
-        //Fetch local community
+                                                sort: sort,
+                                                page: page,
+                                                limit: limit,
+                                                community_id: community.id,
+                                                saved_only: saved_only,
+                                                auth: auth)
+            //Fetch local community
         } else {
             
             return await shared.details(person?.id,
@@ -1101,5 +1160,160 @@ public extension Lemmy {
         return await shared.follow(community: community,
                                    follow: follow,
                                    auth: validAuth)
+    }
+}
+
+//MARK: Mention/Replies/unreadcount
+
+public extension Lemmy {
+    func mentions(sort: CommentSortType? = nil,
+                  page: Int? = nil,
+                  limit: Int? = nil,
+                  unreadOnly: Bool? = nil,
+                  auth: String) async -> GetPersonMentionsResponse? {
+        guard let result = try? await api.request(
+            GetPersonMentions(sort: sort,
+                              page: page,
+                              limit: limit,
+                              unread_only: unreadOnly,
+                              auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func mentions(sort: CommentSortType? = nil,
+                         page: Int? = nil,
+                         limit: Int? = nil,
+                         unreadOnly: Bool? = nil,
+                         auth: String? = nil) async -> GetPersonMentionsResponse? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.mentions(sort: sort,
+                                     page: page,
+                                     limit: limit,
+                                     unreadOnly: unreadOnly,
+                                     auth: validAuth)
+    }
+    
+    func replies(sort: CommentSortType? = nil,
+                 page: Int? = nil,
+                 limit: Int? = nil,
+                 unreadOnly: Bool? = nil,
+                 auth: String) async -> GetRepliesResponse? {
+        guard let result = try? await api.request(
+            GetReplies(sort: sort,
+                       page: page,
+                       limit: limit,
+                       unread_only: unreadOnly,
+                       auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func replies(sort: CommentSortType? = nil,
+                        page: Int? = nil,
+                        limit: Int? = nil,
+                        unreadOnly: Bool? = nil,
+                        auth: String? = nil) async -> GetRepliesResponse? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.replies(sort: sort,
+                                    page: page,
+                                    limit: limit,
+                                    unreadOnly: unreadOnly,
+                                    auth: validAuth)
+    }
+    
+    func unreadCount(auth: String) async -> GetUnreadCountResponse? {
+        guard let result = try? await api.request(
+            GetUnreadCount(auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func unreadCount(auth: String? = nil) async -> GetUnreadCountResponse? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.unreadCount(auth: validAuth)
+    }
+}
+
+//MARK: -- Upload Image
+
+public extension Lemmy {
+    func uploadImage(_ imageData: Data,
+                     auth: String) async -> UploadImageResponse? {
+        guard let result = try? await pictrs.request(
+            UploadImage(image: imageData, auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func uploadImage(_ imageData: Data, auth: String? = nil) async -> UploadImageResponse? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.uploadImage(imageData, auth: validAuth)
+    }
+    
+    func deleteImage(_ imageFile: ImageFile,
+                     auth: String) async -> EmptyResponse? {
+        guard let result = try? await pictrs.request(
+            DeleteImage(file: imageFile.file,
+                        deleteToken: imageFile.delete_token,
+                        auth: auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func deleteImage(_ imageFile: ImageFile,
+                            auth: String? = nil) async -> EmptyResponse? {
+        guard let shared else { return nil }
+        
+        let validAuth: String? = auth ?? shared.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
+        return await shared.deleteImage(imageFile, auth: validAuth)
     }
 }

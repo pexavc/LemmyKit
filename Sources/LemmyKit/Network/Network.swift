@@ -123,19 +123,40 @@ extension Network {
             cachePolicy: .useProtocolCachePolicy,
             timeoutInterval: 10.0)
         
-        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let mp = request.multipartData {
+            
+            let mpRequest = MultipartFormDataRequest()
+            mpRequest.addDataField(fieldName:  mp.fieldName,
+                                   fileName: mp.fileName,
+                                   data: mp.fileData,
+                                   mimeType: mp.mimeType)
+            
+            urlRequest.setValue(mpRequest.contentType,
+                                forHTTPHeaderField: "Content-Type")
+            
+            switch request.method {
+            case .post, .put:
+                mpRequest.addBoundary()
+                urlRequest.httpBody = mpRequest.httpBody as Data
+            default:
+                break
+            }
+        } else {
+            urlRequest.addValue("application/json",
+                                forHTTPHeaderField: "Content-Type")
+            
+            switch request.method {
+            case .post, .put:
+                if let jsonData = try? JSONSerialization.data(withJSONObject: request.data, options: .prettyPrinted) {
+                    urlRequest.httpBody = jsonData
+                }
+            default:
+                break
+            }
+        }
         
         for (name, value) in request.customHeaders {
             urlRequest.addValue(value, forHTTPHeaderField: name)
-        }
-        
-        switch request.method {
-        case .post, .put:
-            if let jsonData = try? JSONSerialization.data(withJSONObject: request.data, options: .prettyPrinted) {
-                urlRequest.httpBody = jsonData
-            }
-        default:
-            break
         }
 
         urlRequest.httpMethod = request.method.rawValue.uppercased()
