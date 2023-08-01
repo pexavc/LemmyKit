@@ -12,7 +12,7 @@ public struct CommentView: Codable, Hashable {
 	public let subscribed: SubscribedType
 	public let saved: Bool
 	public let creator_blocked: Bool
-	public var my_vote: Int?
+	public let my_vote: Int?
 
 	public init(
 		comment: Comment,
@@ -42,9 +42,5 @@ public struct CommentView: Codable, Hashable {
         comment.local = state
         creator.local = state
         post.local = state
-    }
-    
-    mutating public func updateVote(_ vote: Int) {
-        self.my_vote = vote
     }
 }
