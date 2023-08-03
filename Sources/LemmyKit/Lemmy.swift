@@ -35,6 +35,8 @@ public class Lemmy {
     private var api: Network
     private var pictrs: Network
     
+    public var contentURL: String
+    
     public var getSiteTask: Task<Void, Error>? = nil
     public var siteLoaded: Bool = false
     
@@ -57,7 +59,9 @@ public class Lemmy {
         let urlString = LemmyKit.sanitize(apiUrl)
         
         self.api = .init(urlString.apiUrl ?? apiUrl)
-        self.pictrs = .init(pictrsUrl ?? (urlString.baseUrl ?? apiUrl) + "/pictrs/image")
+        let pictrsAPIURL = pictrsUrl ?? (urlString.baseUrl ?? apiUrl) + "/pictrs/image"
+        self.contentURL = pictrsAPIURL
+        self.pictrs = .init(pictrsAPIURL)
         self.isBaseInstance = base
     }
     
