@@ -285,8 +285,8 @@ public extension Lemmy {
                    name: String? = nil,
                    auth: String? = nil) async -> CommunityView? {
         guard let result = try? await api.request(
-            GetCommunity(/*id: id,*/ //id sometimes fails?
-                name: name,
+            GetCommunity(id: id,
+                //name: name,
                 auth: auth ?? self.auth)
         ).async() else {
             return nil
@@ -297,18 +297,20 @@ public extension Lemmy {
     static func community(_ id: CommunityId? = nil,
                           community: Community? = nil,
                           name: String? = nil,
-                          auth: String? = nil) async -> CommunityView? {
+                          auth: String? = nil,
+                          useBase: Bool = true) async -> CommunityView? {
         guard let shared else { return nil }
         
-        //Fetch federated community
-        if let community,
+        //Fetch from actor
+        if useBase == false,
+           let community,
            let domain = getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
             return await instancedLemmy.community(id,
                                                   name: name ?? community.name,
                                                   auth: auth)
-            //Fetch local community
+        //Fetch local community
         } else {
             return await shared.community(id,
                                           name: name ?? community?.name,
@@ -344,15 +346,14 @@ public extension Lemmy {
                sort: SortType? = nil,
                auth: String? = nil,
                isLocal: Bool = true) async -> [PostView] {
+        
         guard let result = try? await api.request(
             GetPosts(type_: type,
                      sort: sort,
                      page: page,
                      limit: limit,
-                     //id can conflict if an instanced server is requested with base Lemmy client. Since the community ids could be different
-                     //This relates to the useBase flag added in the coupled static call
-                     //community_id: community?.id,
-                     community_name: community?.name,
+                     community_id: community?.id,
+                     //community_name: community?.name,
                      auth: auth ?? self.auth,
                      isLocal: isLocal)
         ).async() else {
@@ -368,13 +369,10 @@ public extension Lemmy {
                       sort: SortType? = nil,
                       auth: String? = nil,
                       //TODO: needs revision
-                      useBase: Bool = false) async -> [PostView] {
+                      useBase: Bool = true) async -> [PostView] {
         guard let shared else { return [] }
         
-        
-        /* Fetching from the community's perspective vs base instance's
-         needs to be thought out */
-        //Fetch federated community
+        //Fetch from actor
         if useBase == false,
            let community,
            let domain = LemmyKit.sanitize(community.actor_id).host { //getInstancedDomain(community: community) {
@@ -387,7 +385,7 @@ public extension Lemmy {
                                               sort: sort,
                                               auth: auth ?? shared.auth,
                                               isLocal: false)
-            //Fetch local community
+        //Fetch local community
         } else {
             return await shared.posts(community,
                                       type: type,
@@ -447,11 +445,13 @@ public extension Lemmy {
                          limit: Int? = nil,
                          type: ListingType = .local,
                          sort: CommentSortType = .hot,
-                         auth: String? = nil) async -> [CommentView] {
+                         auth: String? = nil,
+                         useBase: Bool = true) async -> [CommentView] {
         guard let shared else { return [] }
         
         //Fetch federated comments, won't work if only comment is passed in
-        if let community,
+        if useBase == false,
+           let community,
            let domain = LemmyKit.sanitize(community.actor_id).host {//getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             let postId: PostId? = PostId(post?.ap_id.components(separatedBy: "/").last ?? "")
