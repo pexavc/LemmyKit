@@ -182,6 +182,66 @@ public extension Lemmy {
         
         return await shared.login(username: username, password: password, token2FA: token2FA)
     }
+    
+    func register(username: String,
+                  password: String,
+                  password_verify: String,
+                  show_nsfw: Bool,
+                  email: String? = nil,
+                  captcha_uuid: String? = nil,
+                  captcha_answer: String? = nil,
+                  honeypot: String? = nil,
+                  answer: String? = nil
+    ) async -> String? {
+        guard let result = try? await api.request(
+            Register(username: username,
+                     password: password,
+                     password_verify: password_verify,
+                     show_nsfw: show_nsfw,
+                     email: email,
+                     captcha_uuid: captcha_uuid,
+                     captcha_answer: captcha_answer,
+                     honeypot: honeypot,
+                     answer: answer
+                    )
+        ).async() else {
+            return nil
+        }
+        
+        if isBaseInstance {
+            LemmyKit.auth = result.jwt
+            
+            //Update user info
+            _ = await Lemmy.site(auth: result.jwt)
+        } else {
+            self.auth = result.jwt
+            await site(auth: result.jwt)
+        }
+        
+        return result.jwt
+    }
+    static func register(username: String,
+                         password: String,
+                         password_verify: String,
+                         show_nsfw: Bool,
+                         email: String? = nil,
+                         captcha_uuid: String? = nil,
+                         captcha_answer: String? = nil,
+                         honeypot: String? = nil,
+                         answer: String? = nil
+    ) async -> String? {
+        guard let shared else { return nil }
+        
+        return await shared.register(username: username,
+                                     password: password,
+                                     password_verify: password_verify,
+                                     show_nsfw: show_nsfw,
+                                     email: email,
+                                     captcha_uuid: captcha_uuid,
+                                     captcha_answer: captcha_answer,
+                                     honeypot: honeypot,
+                                     answer: answer)
+    }
 }
 
 //MARK: -- User info
@@ -286,8 +346,8 @@ public extension Lemmy {
                    auth: String? = nil) async -> CommunityView? {
         guard let result = try? await api.request(
             GetCommunity(id: id,
-                //name: name,
-                auth: auth ?? self.auth)
+                         //name: name,
+                         auth: auth ?? self.auth)
         ).async() else {
             return nil
         }
@@ -310,7 +370,7 @@ public extension Lemmy {
             return await instancedLemmy.community(id,
                                                   name: name ?? community.name,
                                                   auth: auth)
-        //Fetch local community
+            //Fetch local community
         } else {
             return await shared.community(id,
                                           name: name ?? community?.name,
@@ -385,7 +445,7 @@ public extension Lemmy {
                                               sort: sort,
                                               auth: auth ?? shared.auth,
                                               isLocal: false)
-        //Fetch local community
+            //Fetch local community
         } else {
             return await shared.posts(community,
                                       type: type,
@@ -1319,5 +1379,22 @@ public extension Lemmy {
         }
         
         return await shared.deleteImage(imageFile, auth: validAuth)
+    }
+}
+
+public extension Lemmy {
+    func captcha(auth: String? = nil) async -> GetCaptchaResponse? {
+        guard let result = try? await api.request(
+            GetCaptcha(auth: auth ?? self.auth)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func captcha(auth: String? = nil) async -> GetCaptchaResponse? {
+        guard let shared else { return nil }
+        
+        return await shared.captcha(auth: auth)
     }
 }
