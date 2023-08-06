@@ -293,6 +293,20 @@ public extension Lemmy {
         
         return await shared.site(auth: auth)
     }
+    func metadata(url: String) async -> GetSiteMetadataResponse? {
+        guard let result = try? await api.request(
+            GetSiteMetadata(url: url)
+        ).async() else {
+            return nil
+        }
+        
+        return result
+    }
+    static func metadata(url: String) async -> GetSiteMetadataResponse? {
+        guard let shared else { return nil }
+        
+        return await shared.metadata(url: url)
+    }
     
     func instances(auth: String? = nil) async -> FederatedInstances? {
         guard let result = try? await api.request(
