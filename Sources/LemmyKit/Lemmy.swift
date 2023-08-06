@@ -10,7 +10,7 @@ import Combine
 
 public class Lemmy {
     public class Metadata {
-        var site: Site
+        public var site: Site
         public init(siteView: SiteView) {
             self.site = siteView.site
         }
