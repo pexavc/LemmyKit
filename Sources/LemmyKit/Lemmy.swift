@@ -384,13 +384,13 @@ public extension Lemmy {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
             return await instancedLemmy.community(id,
-                                                  name: name ?? community.name,
+                                                  name: community.name,
                                                   auth: auth,
                                                   useBase: false)
             //Fetch local community
         } else {
-            return await shared.community(id,
-                                          name: name ?? community?.name,
+            return await shared.community(community?.id,
+                                          name: name,
                                           auth: auth)
         }
     }
