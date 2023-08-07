@@ -3,7 +3,7 @@
 import Foundation
 
 public struct CommunityView: Codable, Hashable {
-	public let community: Community
+	public var community: Community
 	public let subscribed: SubscribedType
 	public let blocked: Bool
 	public let counts: CommunityAggregates

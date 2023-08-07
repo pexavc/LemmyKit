@@ -19,11 +19,7 @@ public struct GetPosts: Request {
     public let moderator_view: Bool?
 	public let auth: String?
     
-    /* When a base lemmy instance is fetching posts from
-     a fed. instance we are setting this manually as requests
-     are made from the fed. instance domain the local variable won't
-     be correct in model PostView.Post  */
-    public let isLocal: Bool
+    public var location: FetchType
     
 	public init(
 		type_: ListingType? = nil,
@@ -35,7 +31,7 @@ public struct GetPosts: Request {
 		saved_only: Bool? = nil,
         moderator_view: Bool? = nil,
 		auth: String? = nil,
-        isLocal: Bool = true
+        location: FetchType = .base
 	) {
 		self.type_ = type_
 		self.sort = sort
@@ -46,28 +42,24 @@ public struct GetPosts: Request {
 		self.saved_only = saved_only
         self.moderator_view = moderator_view
 		self.auth = auth
-        self.isLocal = isLocal
+        self.location = location
 	}
     
     public func transform(_ publisher: AnyPublisher<GetPostsResponse, Error>) throws -> AnyPublisher<GetPostsResponse, Error> {
-        guard isLocal == false else {
+        guard location != .base else {
             return publisher
         }
         
         return publisher
             .map { response in
-                if self.isLocal == false {
-                    var newPosts: [PostView] = []
-                    for post in response.posts {
-                        var newPost = post
-                        //isLocal only if actor id is the same as base domain
-                        newPost.isLocal(post.creator.actor_id.contains(LemmyKit.host))
-                        newPosts.append(newPost)
-                    }
-                    return GetPostsResponse(posts: newPosts)
+                var newPosts: [PostView] = []
+                for post in response.posts {
+                    var newPost = post
+                    newPost.update(location: self.location)
+                    newPosts.append(newPost)
                 }
-                return response
-            }.upstream
+                return GetPostsResponse(posts: newPosts)
+            }.eraseToAnyPublisher()
     }
     
     enum CodingKeys: CodingKey {

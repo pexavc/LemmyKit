@@ -55,7 +55,8 @@ public class LemmyKit {
         } else {
             return (nil, nil, nil)
         }
-        
-        return (host, "https://" + host, "https://" + host + "/api/" + Version)
+        let url: String = "https://" + host
+//        LemmyLog(url, logLevel: .debug)
+        return (host, url, "https://" + host + "/api/" + Version)
     }
 }

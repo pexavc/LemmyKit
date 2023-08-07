@@ -19,11 +19,13 @@ public struct Post: Codable, Identifiable, Hashable {
 	public let embed_description: String?
 	public let thumbnail_url: String?
 	public let ap_id: String
-	public var local: Bool
+	public let local: Bool
 	public let embed_video_url: String?
 	public let language_id: LanguageId
 	public let featured_community: Bool
 	public let featured_local: Bool
+    
+    public var location: FetchType? = .base
 
 	public init(
 		id: PostId,

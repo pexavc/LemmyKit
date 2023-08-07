@@ -38,9 +38,9 @@ public struct CommentView: Codable, Hashable {
 		self.my_vote = my_vote
 	}
     
-    mutating func isLocal(_ state: Bool) {
-        comment.local = state
-        creator.local = state
-        post.local = state
+    mutating func update(location: FetchType) {
+        post.location = location
+        creator.location = location
+        comment.location = location
     }
 }

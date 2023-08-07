@@ -12,7 +12,7 @@ public struct Person: Codable, Identifiable, Hashable {
 	public let updated: String?
 	public let actor_id: String
 	public let bio: String?
-	public var local: Bool
+	public let local: Bool
 	public let banner: String?
 	public let deleted: Bool
 	public let inbox_url: String?
@@ -22,6 +22,8 @@ public struct Person: Codable, Identifiable, Hashable {
 	public let ban_expires: String?
 	public let instance_id: InstanceId
 
+    public var location: FetchType? = .base
+    
 	public init(
 		id: PersonId,
 		name: String,

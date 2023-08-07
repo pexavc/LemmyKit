@@ -21,6 +21,8 @@ public struct Community: Codable, Identifiable, Hashable {
 	public let hidden: Bool
 	public let posting_restricted_to_mods: Bool
 	public let instance_id: InstanceId
+    
+    public var location: FetchType? = .base
 
 	public init(
 		id: CommunityId,

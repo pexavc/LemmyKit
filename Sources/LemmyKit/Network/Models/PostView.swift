@@ -41,9 +41,9 @@ public struct PostView: Codable, Hashable {
 		self.unread_comments = unread_comments
 	}
     
-    mutating func isLocal(_ state: Bool) {
-        post.local = state
-        creator.local = state
+    mutating func update(location: FetchType) {
+        post.location = location
+        creator.location = location
     }
 }
 

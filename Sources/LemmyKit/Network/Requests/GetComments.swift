@@ -21,11 +21,7 @@ public struct GetComments: Request {
 	public let saved_only: Bool?
 	public let auth: String?
     
-    /* When a base lemmy instance is fetching comments from
-     a fed. instance we are setting this manually as requests
-     are made from the fed. instance domain the local variable won't
-     be correct in model CommentView.Comment  */
-    public let isLocal: Bool
+    public let location: FetchType
 
 	public init(
 		type_: ListingType? = nil,
@@ -39,7 +35,7 @@ public struct GetComments: Request {
 		parent_id: CommentId? = nil,
 		saved_only: Bool? = nil,
 		auth: String? = nil,
-        isLocal: Bool = true
+        location: FetchType = .base
 	) {
 		self.type_ = type_
 		self.sort = sort
@@ -52,28 +48,24 @@ public struct GetComments: Request {
 		self.parent_id = parent_id
 		self.saved_only = saved_only
 		self.auth = auth
-        self.isLocal = isLocal
+        self.location = location
 	}
     
     public func transform(_ publisher: AnyPublisher<GetCommentsResponse, Error>) throws -> AnyPublisher<GetCommentsResponse, Error> {
-        guard isLocal == false else {
+        guard location != .base else {
             return publisher
         }
         
         return publisher
             .map { response in
-                if self.isLocal == false {
-                    var newComments: [CommentView] = []
-                    for comment in response.comments {
-                        var newComment = comment
-                        //isLocal only if actor id is the same as base domain
-                        newComment.isLocal(comment.creator.actor_id.contains(LemmyKit.host))
-                        newComments.append(newComment)
-                    }
-                    return GetCommentsResponse(comments: newComments)
+                var newComments: [CommentView] = []
+                for comment in response.comments {
+                    var newComment = comment
+                    newComment.update(location: location)
+                    newComments.append(newComment)
                 }
-                return response
-            }.upstream
+                return GetCommentsResponse(comments: newComments)
+            }.eraseToAnyPublisher()
     }
     
     enum CodingKeys: CodingKey {

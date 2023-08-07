@@ -358,11 +358,25 @@ public extension Lemmy {
     func community(_ id: CommunityId? = nil,
                    name: String? = nil,
                    auth: String? = nil,
-                   useBase: Bool = true) async -> CommunityView? {
+                   location: FetchType? = nil) async -> CommunityView? {
+        
+        var communityId: CommunityId? = nil
+        var communityName: String? = nil
+        var validAuth: String? = nil
+        
+        switch location {
+        case .source:
+            communityName = name
+        default:
+            communityId = id
+            validAuth = auth ?? self.auth
+        }
+        
         guard let result = try? await api.request(
-            GetCommunity(id: useBase ? id : nil,
-                         name: useBase ? nil : name,
-                         auth: useBase ? (auth ?? self.auth) : nil)
+            GetCommunity(id: communityId,
+                         name: communityName,
+                         auth: validAuth,
+                         location: location ?? .base)
         ).async() else {
             return nil
         }
@@ -373,25 +387,34 @@ public extension Lemmy {
                           community: Community? = nil,
                           name: String? = nil,
                           auth: String? = nil,
-                          useBase: Bool = true) async -> CommunityView? {
+                          location: FetchType? = nil) async -> CommunityView? {
         guard let shared else { return nil }
         
+        var domain: String? = nil
+        switch location {
+        case .source:
+            if let community {
+                domain = LemmyKit.sanitize(community.actor_id).host
+            }
+        default:
+            break
+        }
+        
         //Fetch from actor
-        if useBase == false,
-           let community,
-           let domain = LemmyKit.sanitize(community.actor_id).host {
+        if let domain {
            //let domain = getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
             return await instancedLemmy.community(id,
-                                                  name: community.name,
+                                                  name: community?.name,
                                                   auth: auth,
-                                                  useBase: false)
+                                                  location: location)
             //Fetch local community
         } else {
             return await shared.community(community?.id,
                                           name: name,
-                                          auth: auth)
+                                          auth: auth,
+                                          location: location)
         }
     }
     
@@ -422,17 +445,28 @@ public extension Lemmy {
                limit: Int? = nil,
                sort: SortType? = nil,
                auth: String? = nil,
-               isLocal: Bool = true) async -> [PostView] {
+               location: FetchType? = nil) async -> [PostView] {
+        
+        var id: CommunityId? = nil
+        var name: String? = nil
+        var validAuth: String? = nil
+        switch location {
+        case .source:
+            name = community?.name
+        default:
+            id = community?.id
+            validAuth = auth ?? self.auth
+        }
         
         guard let result = try? await api.request(
             GetPosts(type_: type,
                      sort: sort,
                      page: page,
                      limit: limit,
-                     community_id: community?.id,
-                     //community_name: community?.name,
-                     auth: auth ?? self.auth,
-                     isLocal: isLocal)
+                     community_id: id,
+                     community_name: name,
+                     auth: validAuth,
+                     location: location ?? .base)
         ).async() else {
             return []
         }
@@ -445,14 +479,21 @@ public extension Lemmy {
                       limit: Int? = nil,
                       sort: SortType? = nil,
                       auth: String? = nil,
-                      //TODO: needs revision
-                      useBase: Bool = true) async -> [PostView] {
+                      location: FetchType? = nil) async -> [PostView] {
         guard let shared else { return [] }
         
+        var domain: String? = nil
+        switch location {
+        case .source:
+            if let community {
+                domain = LemmyKit.sanitize(community.actor_id).host
+            }
+        default:
+            break
+        }
+        
         //Fetch from actor
-        if useBase == false,
-           let community,
-           let domain = LemmyKit.sanitize(community.actor_id).host { //getInstancedDomain(community: community) {
+        if let domain {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
             return await instancedLemmy.posts(community,
@@ -461,7 +502,7 @@ public extension Lemmy {
                                               limit: limit,
                                               sort: sort,
                                               auth: auth ?? shared.auth,
-                                              isLocal: false)
+                                              location: location)
             //Fetch local community
         } else {
             return await shared.posts(community,
@@ -469,7 +510,8 @@ public extension Lemmy {
                                       page: page,
                                       limit: limit,
                                       sort: sort,
-                                      auth: auth)
+                                      auth: auth,
+                                      location: location)
         }
     }
     
@@ -486,10 +528,22 @@ public extension Lemmy {
                   type: ListingType = .local,
                   sort: CommentSortType = .hot,
                   auth: String? = nil,
-                  isLocal: Bool = true) async -> [CommentView] {
+                  location: FetchType? = nil) async -> [CommentView] {
         guard post != nil || comment != nil || community != nil else {
             LemmyLog("Please provide a post, comment, or communit reference")
             return []
+        }
+        
+        let id: CommunityId?
+        let name: String?
+        
+        switch location {
+        case .source:
+            id = nil
+            name = community?.name
+        default:
+            id = nil
+            name = nil
         }
         
         guard let result = try? await api.request(
@@ -498,38 +552,58 @@ public extension Lemmy {
                         max_depth: depth,
                         page: page,
                         limit: limit,
-                        //id can conflict if an instanced server is requested with base Lemmy client. Since the community ids could be different
-                        //community_id: community?.id,
-                        community_name: community?.name,
+                        community_id: id,
+                        community_name: name,
                         post_id: postId ?? post?.id,
                         parent_id: comment?.id,
                         auth: auth ?? self.auth,
-                        isLocal: isLocal)
+                        location: location ?? .base)
         ).async() else {
             return []
         }
         
         return result.comments
     }
-    /* Should only use post when viewing comments to resolve against base client
-     post id with a community passed in that is not of the same community id as seen in the base client will not resolve
-     */
     static func comments(_ post: Post? = nil,
                          comment: Comment? = nil,
-                         community: Community? = nil,//required to get instanced community incase
+                         community: Community? = nil,
                          depth: Int = 1,
                          page: Int? = nil,
                          limit: Int? = nil,
                          type: ListingType = .local,
                          sort: CommentSortType = .hot,
                          auth: String? = nil,
-                         useBase: Bool = true) async -> [CommentView] {
+                         location: FetchType? = nil) async -> [CommentView] {
         guard let shared else { return [] }
         
         //Fetch federated comments, won't work if only comment is passed in
+        let useBase: Bool
+        let actor: String?
+        var postId: PostId? = post?.id
+        switch location {
+        case .source:
+            actor = community?.actor_id
+            useBase = false
+        case .peer:
+            actor = post?.ap_id
+            useBase = false
+        default:
+            if post?.location != .base,
+               let ap_id = post?.ap_id {
+                
+                let response = await Lemmy.resolveURL(ap_id)
+                LemmyLog("resolving \(response?.post?.post.id)", logLevel: .debug)
+                postId = response?.post?.post.id
+            }
+            useBase = true
+            actor = nil
+        }
+        
+        LemmyLog("[\(actor ?? "")] | location: \(location)", logLevel: .debug)
+        
         if useBase == false,
-           let community,
-           let domain = LemmyKit.sanitize(community.actor_id).host {//getInstancedDomain(community: community) {
+           let actor,
+           let domain = LemmyKit.sanitize(actor).host {//getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             let postId: PostId? = PostId(post?.ap_id.components(separatedBy: "/").last ?? "")
             return await instancedLemmy.comments(post,
@@ -542,10 +616,11 @@ public extension Lemmy {
                                                  type: type,
                                                  sort: sort,
                                                  auth: auth,
-                                                 isLocal: false)
+                                                 location: location)
             //Fetch local community
         } else {
             return await shared.comments(post,
+                                         postId: postId,
                                          comment: comment,
                                          community: community,
                                          depth: depth,
@@ -553,7 +628,8 @@ public extension Lemmy {
                                          limit: limit,
                                          type: type,
                                          sort: sort,
-                                         auth: auth)
+                                         auth: auth,
+                                         location: location)
         }
     }
 }
@@ -1413,5 +1489,85 @@ public extension Lemmy {
         guard let shared else { return nil }
         
         return await shared.captcha(auth: auth)
+    }
+}
+
+//MARK: -- Resolve
+//WORK IN PROGRESS
+public extension Lemmy {
+    func resolve(_ resource: ResourceType,
+                 auth: String) async -> ResourceType? {
+        let q: String
+
+        switch resource {
+        case .post(let model):
+            q = model.post.ap_id
+        default:
+            q = ""
+        }
+
+        LemmyLog(q, logLevel: .debug)
+
+        guard let result = try? await api.request(
+            ResolveObject(q: q, auth: auth)
+        ).async() else {
+            LemmyLog("failed", logLevel: .error)
+            return nil
+        }
+
+        switch resource {
+        case .post:
+            guard let model = result.post else { return nil }
+            LemmyLog("resolved: \(model.post.id)", logLevel: .debug)
+            return .post(model)
+        case .comment:
+            guard let model = result.comment else { return nil }
+            return .comment(model)
+        case .creator:
+            guard let model = result.person else { return nil }
+            return .creator(model)
+        case .community:
+            guard let model = result.community else { return nil }
+            return .community(model)
+        }
+    }
+    static func resolve(_ object: ResourceType,
+                        auth: String? = nil) async -> ResourceType? {
+        guard let shared else { return nil }
+
+        let validAuth: String? = auth ?? shared.auth
+
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+
+        return await shared.resolve(object, auth: validAuth)
+    }
+    
+    func resolveURL(_ q: String,
+                    auth: String) async -> ResolveObject.Response? {
+
+        guard let result = try? await api.request(
+            ResolveObject(q: q, auth: auth)
+        ).async() else {
+            LemmyLog("failed", logLevel: .error)
+            return nil
+        }
+        
+        return result
+    }
+    static func resolveURL(_ q: String,
+                           auth: String? = nil) async -> ResolveObject.Response? {
+        guard let shared else { return nil }
+
+        let validAuth: String? = auth ?? shared.auth
+
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+
+        return await shared.resolveURL(q, auth: validAuth)
     }
 }

@@ -17,6 +17,8 @@ public struct Comment: Codable, Identifiable, Hashable {
 	public let distinguished: Bool
 	public let language_id: LanguageId
 
+    public var location: FetchType? = .base
+    
 	public init(
 		id: CommentId,
 		creator_id: PersonId,
