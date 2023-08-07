@@ -357,11 +357,12 @@ public extension Lemmy {
     
     func community(_ id: CommunityId? = nil,
                    name: String? = nil,
-                   auth: String? = nil) async -> CommunityView? {
+                   auth: String? = nil,
+                   useBase: Bool = true) async -> CommunityView? {
         guard let result = try? await api.request(
-            GetCommunity(id: id,
-                         //name: name,
-                         auth: auth ?? self.auth)
+            GetCommunity(id: useBase ? id : nil,
+                         name: useBase ? nil : name,
+                         auth: useBase ? (auth ?? self.auth) : nil)
         ).async() else {
             return nil
         }
@@ -378,12 +379,14 @@ public extension Lemmy {
         //Fetch from actor
         if useBase == false,
            let community,
-           let domain = getInstancedDomain(community: community) {
+           let domain = LemmyKit.sanitize(community.actor_id).host {
+           //let domain = getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
             return await instancedLemmy.community(id,
                                                   name: name ?? community.name,
-                                                  auth: auth)
+                                                  auth: auth,
+                                                  useBase: false)
             //Fetch local community
         } else {
             return await shared.community(id,
