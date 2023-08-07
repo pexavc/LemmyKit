@@ -721,7 +721,7 @@ public extension Lemmy {
         
         return result
     }
-    static func saveComment(comment: Comment,
+    static func saveComment(_ comment: Comment,
                             save: Bool,
                             auth: String? = nil) async -> CommentResponse? {
         guard let shared else { return nil }
