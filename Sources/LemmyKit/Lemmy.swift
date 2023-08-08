@@ -360,16 +360,16 @@ public extension Lemmy {
                    auth: String? = nil,
                    location: FetchType? = nil) async -> CommunityView? {
         
-        var communityId: CommunityId? = nil
-        var communityName: String? = nil
-        var validAuth: String? = nil
+        var communityId: CommunityId? = id
+        var communityName: String? = name
+        var validAuth: String? = auth ?? self.auth
         
         switch location {
         case .source:
-            communityName = name
+            communityId = nil
+            validAuth = nil
         default:
-            communityId = id
-            validAuth = auth ?? self.auth
+            break
         }
         
         guard let result = try? await api.request(
@@ -390,28 +390,39 @@ public extension Lemmy {
                           location: FetchType? = nil) async -> CommunityView? {
         guard let shared else { return nil }
         
-        var domain: String? = nil
+        LemmyLog("\(community?.actor_id ?? "") | location: \(location?.description ?? "unknown")")
+        var communityId: CommunityId? = id ?? community?.id
+        var name: String? = name ?? community?.name
+        
+        let useBase: Bool
+        let actor: String?
         switch location {
         case .source:
-            if let community {
-                domain = LemmyKit.sanitize(community.actor_id).host
-            }
+            actor = community?.actor_id
+            useBase = false
+            communityId = nil
+            name = community?.name
+        case .peer(let host):
+            actor = host
+            useBase = false
         default:
-            break
+            useBase = true
+            actor = nil
         }
         
         //Fetch from actor
-        if let domain {
-           //let domain = getInstancedDomain(community: community) {
+        if  useBase == false,
+            let actor,
+            let domain = LemmyKit.sanitize(actor).host {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
-            return await instancedLemmy.community(id,
+            return await instancedLemmy.community(communityId,
                                                   name: community?.name,
                                                   auth: auth,
                                                   location: location)
             //Fetch local community
         } else {
-            return await shared.community(community?.id,
+            return await shared.community(communityId,
                                           name: name,
                                           auth: auth,
                                           location: location)
@@ -483,13 +494,22 @@ public extension Lemmy {
         guard let shared else { return [] }
         
         var domain: String? = nil
+        var community: Community? = community
         switch location {
         case .source:
-            if let community {
-                domain = LemmyKit.sanitize(community.actor_id).host
-            }
+            domain = community?.actor_id
+        case .peer(let host):
+            domain = host
         default:
-            break
+            //Community's ap_id is a custom field
+            //transformed during commentView responses
+            //Comment's can be peers, but their community actor ids
+            //may not reflect truthfully the source of their instance
+            if let ap_id = community?.ap_id {
+                let response = await Lemmy.resolveURL(ap_id)
+                LemmyLog("resolving \(response?.community?.community.id)", logLevel: .debug)
+                community = response?.community?.community
+            }
         }
         
         //Fetch from actor
@@ -530,7 +550,7 @@ public extension Lemmy {
                   auth: String? = nil,
                   location: FetchType? = nil) async -> [CommentView] {
         guard post != nil || comment != nil || community != nil else {
-            LemmyLog("Please provide a post, comment, or communit reference")
+            LemmyLog("Please provide a resource object")
             return []
         }
         

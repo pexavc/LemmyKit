@@ -23,6 +23,7 @@ public struct Community: Codable, Identifiable, Hashable {
 	public let instance_id: InstanceId
     
     public var location: FetchType? = .base
+    public var ap_id: String? = nil
 
 	public init(
 		id: CommunityId,

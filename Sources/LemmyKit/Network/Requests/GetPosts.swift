@@ -46,16 +46,13 @@ public struct GetPosts: Request {
 	}
     
     public func transform(_ publisher: AnyPublisher<GetPostsResponse, Error>) throws -> AnyPublisher<GetPostsResponse, Error> {
-        guard location != .base else {
-            return publisher
-        }
-        
         return publisher
             .map { response in
                 var newPosts: [PostView] = []
                 for post in response.posts {
                     var newPost = post
                     newPost.update(location: self.location)
+                    newPost.community.ap_id = newPost.post.ap_id
                     newPosts.append(newPost)
                 }
                 return GetPostsResponse(posts: newPosts)

@@ -5,7 +5,7 @@ import Foundation
 public struct PostView: Codable, Hashable {
 	public var post: Post
 	public var creator: Person
-	public let community: Community
+	public var community: Community
 	public let creator_banned_from_community: Bool
 	public let counts: PostAggregates
 	public let subscribed: SubscribedType
@@ -44,6 +44,7 @@ public struct PostView: Codable, Hashable {
     mutating func update(location: FetchType) {
         post.location = location
         creator.location = location
+        community.location = location
     }
 }
 

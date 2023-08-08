@@ -6,7 +6,7 @@ public struct CommentView: Codable, Hashable {
 	public var comment: Comment
 	public var creator: Person
 	public var post: Post
-	public let community: Community
+	public var community: Community
 	public let counts: CommentAggregates
 	public let creator_banned_from_community: Bool
 	public let subscribed: SubscribedType
@@ -42,5 +42,13 @@ public struct CommentView: Codable, Hashable {
         post.location = location
         creator.location = location
         comment.location = location
+        switch location {
+        case .peer(let host):
+            community.location = .peer(host)
+            community.ap_id = host
+        default:
+            community.location = location
+            community.ap_id = creator.actor_id
+        }
     }
 }
