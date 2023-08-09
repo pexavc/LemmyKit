@@ -17,7 +17,7 @@ public class LemmyKit {
             let sanitizedValue = sanitize(newValue)
             
             self.host = sanitizedValue.host ?? ""
-            _baseUrl = sanitizedValue.apiUrl ?? ""
+            _baseUrl = sanitizedValue.baseUrl ?? ""
             current = .init(apiUrl: _baseUrl, base: true)
         }
     }

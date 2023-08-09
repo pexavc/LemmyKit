@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
+//Note: This will be broken up into several sub files and classes for better readability
+
 public class Lemmy {
     public class Metadata {
         public var site: Site
@@ -50,6 +52,8 @@ public class Lemmy {
     
     private var isBaseInstance: Bool
     
+    private var baseURL: String
+    
     public init(id: UUID? = nil,
                 apiUrl: String,
                 pictrsUrl: String? = nil,
@@ -57,6 +61,7 @@ public class Lemmy {
         self.id = id ?? .init()
         
         let urlString = LemmyKit.sanitize(apiUrl)
+        self.baseURL = urlString.baseUrl ?? apiUrl
         
         self.api = .init(urlString.apiUrl ?? apiUrl)
         let pictrsAPIURL = pictrsUrl ?? (urlString.baseUrl ?? apiUrl) + "/pictrs/image"
@@ -1518,23 +1523,23 @@ public extension Lemmy {
     func resolve(_ resource: ResourceType,
                  auth: String) async -> ResourceType? {
         let q: String
-
+        
         switch resource {
         case .post(let model):
             q = model.post.ap_id
         default:
             q = ""
         }
-
+        
         LemmyLog(q, logLevel: .debug)
-
+        
         guard let result = try? await api.request(
             ResolveObject(q: q, auth: auth)
         ).async() else {
             LemmyLog("failed", logLevel: .error)
             return nil
         }
-
+        
         switch resource {
         case .post:
             guard let model = result.post else { return nil }
@@ -1554,20 +1559,20 @@ public extension Lemmy {
     static func resolve(_ object: ResourceType,
                         auth: String? = nil) async -> ResourceType? {
         guard let shared else { return nil }
-
+        
         let validAuth: String? = auth ?? shared.auth
-
+        
         guard let validAuth else {
             LemmyLog("Authentication required")
             return nil
         }
-
+        
         return await shared.resolve(object, auth: validAuth)
     }
     
     func resolveURL(_ q: String,
                     auth: String) async -> ResolveObject.Response? {
-
+        
         guard let result = try? await api.request(
             ResolveObject(q: q, auth: auth)
         ).async() else {
@@ -1580,14 +1585,49 @@ public extension Lemmy {
     static func resolveURL(_ q: String,
                            auth: String? = nil) async -> ResolveObject.Response? {
         guard let shared else { return nil }
-
+        
         let validAuth: String? = auth ?? shared.auth
-
+        
         guard let validAuth else {
             LemmyLog("Authentication required")
             return nil
         }
-
+        
         return await shared.resolveURL(q, auth: validAuth)
+    }
+}
+
+//MARK: Ping
+public extension Lemmy {
+    func ping(_ host: String? = nil) async -> (isUp: Bool, time: TimeInterval)? {
+        //LemmyLog(host ?? baseURL, logLevel: .debug)
+        if let url = URL(string: host ?? baseURL) {
+            var request = URLRequest(url: url)
+            request.httpMethod = "HEAD"
+            
+            let time = DispatchTime.now().uptimeNanoseconds
+            
+            let data = try? await URLSession.shared.data(for: request)
+            
+            let elapsed = DispatchTime.now().uptimeNanoseconds - time
+            let totalTime = TimeInterval(elapsed)/1e9
+            
+            guard let data,
+                  let response = data.1 as? HTTPURLResponse else {
+                return (false, totalTime)
+            }
+            
+            switch response.statusCode {
+            case 200:
+                return (true, totalTime)
+            default:
+                return (false, totalTime)
+            }
+        } else {
+            return nil
+        }
+    }
+    static func ping(_ host: String? = nil) async -> (isUp: Bool, time: CFAbsoluteTime)? {
+        return await shared?.ping(host)
     }
 }
