@@ -31,19 +31,25 @@ class Network {
         }
     }
     
+    let queue: DispatchQueue
     var headers = [String : String]()
     var configuration : Configuration
+    static var throttle: Double = 0.25
     
-    init(_ endpoint: String) {
+    init(_ endpoint: String, uniqueId: String? = nil) {
         configuration = .init(endpoint: endpoint)
+        self.queue = .init(label: "lemmykit.network.service.\(LemmyKit.sanitize(endpoint).host ?? "unknown_host").\(uniqueId ?? "base")", qos: .userInitiated)
     }
         
     func request<R : Request>(_ request : R,
                               options : RequestOptions = .init(),
                               progress : Progress? = nil) -> AnyPublisher<R.TransformedResponse, Error> {
-      
+        
+        
+        
         return makeUrlComponents(for: request)
             .flatMap { self.makeURLRequest(from: request, components: $0) }
+            .throttle(for: .seconds(Network.throttle), scheduler: queue, latest: true)
             .flatMap { self.executeURLRequest(request, urlRequest: $0, progress: progress) }
             .flatMap { self.decodeURLResponse(request, urlResult: $0) }
             .receive(on: DispatchQueue.global(qos: .utility))
@@ -188,7 +194,7 @@ extension Network {
                 
                 progress?.addChild(task.progress, withPendingUnitCount: 100)
                 
-                print("[NetworkService] Sending request: \(R.self) w/ \(String(describing: urlRequest.url))")
+                LemmyLog("🌏 [Network] 🌍 | \(R.self) -> \(String(describing: urlRequest.url))", logLevel: .debug)
                 
                 task.resume()
             }

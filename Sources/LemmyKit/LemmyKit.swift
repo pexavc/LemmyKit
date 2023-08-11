@@ -40,6 +40,11 @@ public class LemmyKit {
     
     public static var logLevel: LemmyLogLevel = .debug
     
+    public static var throttle: Double = 0.25 {
+        didSet {
+            Network.throttle = throttle
+        }
+    }
     
     static func sanitize(_ base: String) -> (host: String?, baseUrl: String?, apiUrl: String?) {
         let value: String = (base.contains("http") ? "" : "https://") + base

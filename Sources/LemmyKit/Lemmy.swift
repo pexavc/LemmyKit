@@ -66,7 +66,7 @@ public class Lemmy {
         self.api = .init(urlString.apiUrl ?? apiUrl)
         let pictrsAPIURL = pictrsUrl ?? (urlString.baseUrl ?? apiUrl) + "/pictrs/image"
         self.contentURL = pictrsAPIURL
-        self.pictrs = .init(pictrsAPIURL)
+        self.pictrs = .init(pictrsAPIURL, uniqueId: "pictrs")
         self.isBaseInstance = base
     }
     

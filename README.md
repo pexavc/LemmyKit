@@ -117,7 +117,7 @@ await Lemmy.createComment("Reply to a comment",
 
 ## Swift Interface API
 
-> Currently supported requests in the Swift interface. Will be updated periodically.
+> Lots of the main interactions have been implemented. `Lemmy.swift` for reference.
 
 ### Auth/Registration
 
@@ -158,6 +158,20 @@ func createComment(_ content: String,
                    post: Post,
                    parent: Comment? = nil,
                    auth: String) async -> Comment? {
+```
+
+### Content
+
+```swift
+func uploadImage(_ imageData: Data, auth: String? = nil) async -> UploadImageResponse? {
+
+func deleteImage(_ imageFile: ImageFile, auth: String? = nil) async -> EmptyResponse? {
+```
+
+### Misc
+
+```swift
+func ping(_ host: String? = nil) async -> (isUp: Bool, time: TimeInterval)?
 ```
 
 

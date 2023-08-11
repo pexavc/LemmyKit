@@ -21,10 +21,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "LemmyKit",
-            dependencies: [],
-            resources: [
-                .copy("Resources/web.bundle")
-            ]),
+            dependencies: []),
         .executableTarget(name: "LemmyExecutable",
                           dependencies: ["LemmyKit"]),
         .testTarget(
