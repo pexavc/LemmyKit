@@ -461,6 +461,7 @@ public extension Lemmy {
                limit: Int? = nil,
                sort: SortType? = nil,
                auth: String? = nil,
+               saved_only: Bool? = nil,
                location: FetchType? = nil) async -> [PostView] {
         
         var id: CommunityId? = nil
@@ -481,6 +482,7 @@ public extension Lemmy {
                      limit: limit,
                      community_id: id,
                      community_name: name,
+                     saved_only: saved_only,
                      auth: validAuth,
                      location: location ?? .base)
         ).async() else {
@@ -495,6 +497,7 @@ public extension Lemmy {
                       limit: Int? = nil,
                       sort: SortType? = nil,
                       auth: String? = nil,
+                      saved_only: Bool? = nil,
                       location: FetchType? = nil) async -> [PostView] {
         guard let shared else { return [] }
         
@@ -512,7 +515,7 @@ public extension Lemmy {
             //may not reflect truthfully the source of their instance
             if let ap_id = community?.ap_id {
                 let response = await Lemmy.resolveURL(ap_id)
-                LemmyLog("resolving \(response?.community?.community.id)", logLevel: .debug)
+                LemmyLog("resolving \(response?.community?.community.id ?? -1)", logLevel: .debug)
                 community = response?.community?.community
             }
         }
@@ -536,6 +539,7 @@ public extension Lemmy {
                                       limit: limit,
                                       sort: sort,
                                       auth: auth,
+                                      saved_only: saved_only,
                                       location: location)
         }
     }
@@ -553,6 +557,7 @@ public extension Lemmy {
                   type: ListingType = .local,
                   sort: CommentSortType = .hot,
                   auth: String? = nil,
+                  saved_only: Bool? = nil,
                   location: FetchType? = nil) async -> [CommentView] {
         guard post != nil || comment != nil || community != nil else {
             LemmyLog("Please provide a resource object")
@@ -581,6 +586,7 @@ public extension Lemmy {
                         community_name: name,
                         post_id: postId ?? post?.id,
                         parent_id: comment?.id,
+                        saved_only: saved_only,
                         auth: auth ?? self.auth,
                         location: location ?? .base)
         ).async() else {
@@ -598,6 +604,7 @@ public extension Lemmy {
                          type: ListingType = .local,
                          sort: CommentSortType = .hot,
                          auth: String? = nil,
+                         saved_only: Bool? = nil,
                          location: FetchType? = nil) async -> [CommentView] {
         guard let shared else { return [] }
         
@@ -654,6 +661,7 @@ public extension Lemmy {
                                          type: type,
                                          sort: sort,
                                          auth: auth,
+                                         saved_only: saved_only,
                                          location: location)
         }
     }
@@ -1132,7 +1140,8 @@ public extension Lemmy {
                  limit: Int? = nil,
                  community_id: CommunityId? = nil,
                  saved_only: Bool? = nil,
-                 auth: String? = nil) async -> GetPersonDetailsResponse? {
+                 auth: String? = nil,
+                 location: FetchType = .base) async -> GetPersonDetailsResponse? {
         guard let result = try? await api.request(
             GetPersonDetails(person_id: person_id,
                              sort: sort,
@@ -1140,7 +1149,8 @@ public extension Lemmy {
                              limit: limit,
                              community_id: community_id,
                              saved_only: saved_only,
-                             auth: auth ?? self.auth)
+                             auth: auth ?? self.auth,
+                             location: location)
         ).async() else {
             return nil
         }
@@ -1154,21 +1164,38 @@ public extension Lemmy {
                         community: Community? = nil,
                         saved_only: Bool? = nil,
                         auth: String? = nil,
-                        useBase: Bool = true) async -> GetPersonDetailsResponse? {
+                        location: FetchType = .base) async -> GetPersonDetailsResponse? {
         guard let shared else { return nil }
         
+        let useBase: Bool
+        let actor_id: String?
+        switch location {
+        case .base:
+            useBase = true
+            actor_id = nil
+        case .source:
+            useBase = false
+            actor_id = person?.actor_id
+        case .peer(let host):
+            useBase = false
+            actor_id = host
+            
+        }
+        
         if useBase == false,
-           let community,
-           let domain = LemmyKit.sanitize(community.actor_id).host { //getInstancedDomain(community: community) {
+           let person,
+           let actor_id,
+           let domain = LemmyKit.sanitize(actor_id).host { //getInstancedDomain(community: community) {
             let instancedLemmy: Lemmy = .init(apiUrl: domain)
             
-            return await instancedLemmy.details(person?.id,
+            return await instancedLemmy.details(person.id,
                                                 sort: sort,
                                                 page: page,
                                                 limit: limit,
-                                                community_id: community.id,
+                                                community_id: community?.id,
                                                 saved_only: saved_only,
-                                                auth: auth)
+                                                auth: auth,
+                                                location: location)
             //Fetch local community
         } else {
             
@@ -1178,7 +1205,8 @@ public extension Lemmy {
                                         limit: limit,
                                         community_id: community?.id,
                                         saved_only: saved_only,
-                                        auth: auth)
+                                        auth: auth,
+                                        location: location)
         }
     }
 }

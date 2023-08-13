@@ -1,6 +1,7 @@
 /* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
 
 import Foundation
+import Combine
 
 public struct GetPersonDetails: Request {
 	public typealias Response = GetPersonDetailsResponse
@@ -16,6 +17,8 @@ public struct GetPersonDetails: Request {
 	public let community_id: CommunityId?
 	public let saved_only: Bool?
 	public let auth: String?
+    
+    public let location: FetchType
 
 	public init(
 		person_id: PersonId? = nil,
@@ -25,7 +28,8 @@ public struct GetPersonDetails: Request {
 		limit: Int? = nil,
 		community_id: CommunityId? = nil,
 		saved_only: Bool? = nil,
-		auth: String? = nil
+		auth: String? = nil,
+        location: FetchType = .base
 	) {
 		self.person_id = person_id
 		self.username = username
@@ -35,7 +39,31 @@ public struct GetPersonDetails: Request {
 		self.community_id = community_id
 		self.saved_only = saved_only
 		self.auth = auth
+        self.location = location
 	}
+    
+    public func transform(_ publisher: AnyPublisher<GetPersonDetailsResponse, Error>) throws -> AnyPublisher<GetPersonDetailsResponse, Error> {
+        return publisher
+            .map { response in
+                var newPosts: [PostView] = []
+                var newComments: [CommentView] = []
+                
+                for post in response.posts {
+                    var newPost = post
+                    newPost.update(location: self.location)
+                    newPost.community.ap_id = newPost.post.ap_id
+                    newPosts.append(newPost)
+                }
+                
+                for comment in response.comments {
+                    var newComment = comment
+                    newComment.update(location: location)
+                    newComments.append(newComment)
+                }
+                
+                return .init(person_view: response.person_view, comments: newComments, posts: newPosts, moderates: response.moderates)
+            }.eraseToAnyPublisher()
+    }
 }
 
 public struct GetPersonDetailsResponse: Codable, Hashable {

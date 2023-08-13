@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  FetchType.swift
 //  
 //
 //  Created by PEXAVC on 8/7/23.
@@ -35,6 +35,17 @@ public enum FetchType: CustomStringConvertible, Equatable, Codable, Hashable {
             hasher.combine(self.description+host)
         default:
             hasher.combine(self.description)
+        }
+    }
+    
+    public var host: String? {
+        switch self {
+        case .peer(let host):
+            return host
+        case .source:
+            return nil
+        case .base:
+            return LemmyKit.host
         }
     }
 }
