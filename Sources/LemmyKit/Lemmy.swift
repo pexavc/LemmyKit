@@ -515,8 +515,10 @@ public extension Lemmy {
             //may not reflect truthfully the source of their instance
             if let ap_id = community?.ap_id {
                 let response = await Lemmy.resolveURL(ap_id)
-                LemmyLog("resolving \(response?.community?.community.id ?? -1)", logLevel: .debug)
-                community = response?.community?.community
+                if let resolvedCommunity = response?.community?.community {
+                    LemmyLog("resolving \(resolvedCommunity.id)", logLevel: .debug)
+                    community = resolvedCommunity
+                }
             }
         }
         
@@ -624,8 +626,10 @@ public extension Lemmy {
                let ap_id = post?.ap_id {
                 
                 let response = await Lemmy.resolveURL(ap_id)
-                LemmyLog("resolving \(response?.post?.post.id)", logLevel: .debug)
-                postId = response?.post?.post.id
+                if let resolvedPost = response?.post?.post {
+                    LemmyLog("resolving \(resolvedPost.id)", logLevel: .debug)
+                    postId = resolvedPost.id
+                }
             }
             useBase = true
             actor = nil
