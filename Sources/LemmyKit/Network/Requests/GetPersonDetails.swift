@@ -64,6 +64,10 @@ public struct GetPersonDetails: Request {
                 return .init(person_view: response.person_view, comments: newComments, posts: newPosts, moderates: response.moderates)
             }.eraseToAnyPublisher()
     }
+    
+    enum CodingKeys: CodingKey {
+        case person_id, username, sort, page, limit, community_id, saved_only, auth
+    }
 }
 
 public struct GetPersonDetailsResponse: Codable, Hashable {
