@@ -96,6 +96,9 @@ public extension Lemmy {
             
             //Update user info
             _ = await Lemmy.site(auth: result.jwt)
+        } else {
+            self.auth = result.jwt
+            _ = await self.site(auth: result.jwt)
         }
         
         return result
