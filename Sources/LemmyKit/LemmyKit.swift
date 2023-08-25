@@ -29,10 +29,15 @@ public class LemmyKit {
     
     public static var auth: String? {
         get {
-            return Lemmy.shared?.auth
+            return current.auth
         }
         set {
-            Lemmy.shared?.auth = newValue
+            current.auth = newValue
+            
+            if newValue == nil {
+                //reset
+                current.user = nil
+            }
         }
     }
     
