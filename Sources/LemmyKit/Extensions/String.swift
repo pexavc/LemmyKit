@@ -8,6 +8,14 @@
 import Foundation
 
 extension String {
+    var host: String? {
+        if let sanitized = URL(string: self)?.host {
+            return sanitized
+        } else {
+            return nil
+        }
+    }
+    
     func replace(_ pattern: String,
                  with template: String,
                  options: NSRegularExpression.Options = .caseInsensitive) -> String {

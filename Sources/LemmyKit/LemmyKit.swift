@@ -60,7 +60,7 @@ public class LemmyKit {
         /*if #available(macOS 13.0, iOS 16.0, *),
            let sanitized = URL(string: value)?.host(percentEncoded: false) {
             host = sanitized
-        } else */if let sanitized = URL(string: value)?.host {
+        } else */if let sanitized = value.host {
             host = sanitized
         } else {
             return (nil, nil, nil)
