@@ -167,13 +167,20 @@ public extension Lemmy {
                   page: Int? = nil,
                   limit: Int? = nil,
                   unreadOnly: Bool? = nil,
-                  auth: String) async -> GetPersonMentionsResponse? {
+                  auth: String?) async -> GetPersonMentionsResponse? {
+        let validAuth: String? = auth ?? self.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
         guard let result = try? await api.request(
             GetPersonMentions(sort: sort,
                               page: page,
                               limit: limit,
                               unread_only: unreadOnly,
-                              auth: auth)
+                              auth: validAuth)
         ).async() else {
             return nil
         }
@@ -187,31 +194,31 @@ public extension Lemmy {
                          auth: String? = nil) async -> GetPersonMentionsResponse? {
         guard let shared else { return nil }
         
-        let validAuth: String? = auth ?? shared.auth
-        
-        guard let validAuth else {
-            LemmyLog("Authentication required")
-            return nil
-        }
-        
         return await shared.mentions(sort: sort,
                                      page: page,
                                      limit: limit,
                                      unreadOnly: unreadOnly,
-                                     auth: validAuth)
+                                     auth: auth)
     }
     
     func replies(sort: CommentSortType? = nil,
                  page: Int? = nil,
                  limit: Int? = nil,
                  unreadOnly: Bool? = nil,
-                 auth: String) async -> GetRepliesResponse? {
+                 auth: String?) async -> GetRepliesResponse? {
+        let validAuth: String? = auth ?? self.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
         guard let result = try? await api.request(
             GetReplies(sort: sort,
                        page: page,
                        limit: limit,
                        unread_only: unreadOnly,
-                       auth: auth)
+                       auth: validAuth)
         ).async() else {
             return nil
         }
@@ -225,18 +232,11 @@ public extension Lemmy {
                         auth: String? = nil) async -> GetRepliesResponse? {
         guard let shared else { return nil }
         
-        let validAuth: String? = auth ?? shared.auth
-        
-        guard let validAuth else {
-            LemmyLog("Authentication required")
-            return nil
-        }
-        
         return await shared.replies(sort: sort,
                                     page: page,
                                     limit: limit,
                                     unreadOnly: unreadOnly,
-                                    auth: validAuth)
+                                    auth: auth)
     }
     
     func unreadCount(auth: String) async -> GetUnreadCountResponse? {

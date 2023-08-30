@@ -16,9 +16,9 @@ LemmyKit.baseUrl = "https://lemmy.world"
 //                                  password: "...")
 
 
-let time = CFAbsoluteTimeGetCurrent()
-let instances = await Lemmy.getInstances()
-print("\(CFAbsoluteTimeGetCurrent() - time)s to get all instances")
+//let time = CFAbsoluteTimeGetCurrent()
+//let instances = await Lemmy.getInstances()
+//print("\(CFAbsoluteTimeGetCurrent() - time)s to get all instances")
 
 
 ////Getting a specific community
