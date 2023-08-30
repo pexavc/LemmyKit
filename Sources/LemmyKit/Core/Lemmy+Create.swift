@@ -11,9 +11,17 @@ import Foundation
 
 public extension Lemmy {
     @discardableResult
-    func createCommunity(_ title: String, auth: String) async -> Community? {
+    func createCommunity(_ title: String, auth: String? = nil) async -> Community? {
+        
+        let validAuth: String? = auth ?? self.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
         guard let result = try? await api.request(
-            CreateCommunity(name: title.lowercased(), title: title, auth: auth)
+            CreateCommunity(name: title.lowercased(), title: title, auth: validAuth)
         ).async() else {
             return nil
         }
@@ -21,17 +29,10 @@ public extension Lemmy {
         return result.community_view.community
     }
     @discardableResult
-    static func createCommunity(_ title: String, auth: String? = nil) async -> Community? {
+    static func createCommunity(_ title: String,
+                                auth: String? = nil) async -> Community? {
         guard let shared else { return nil }
-        
-        let validAuth: String? = auth ?? shared.auth
-        
-        guard let validAuth else {
-            LemmyLog("Authentication required")
-            return nil
-        }
-        
-        return await shared.createCommunity(title, auth: validAuth)
+        return await shared.createCommunity(title, auth: auth)
     }
     
     @discardableResult
@@ -40,13 +41,21 @@ public extension Lemmy {
                     url: String? = nil,
                     body: String? = nil,
                     community: Community,
-                    auth: String) async -> PostView? {
+                    auth: String? = nil) async -> PostView? {
+        
+        let validAuth: String? = auth ?? self.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
         guard let result = try? await api.request(
             CreatePost(name: title,
                        community_id: community.id,
                        url: url,
                        body: body,
-                       auth: auth)
+                       auth: validAuth)
         ).async() else {
             return nil
         }
@@ -62,19 +71,12 @@ public extension Lemmy {
                            auth: String? = nil) async -> PostView? {
         guard let shared else { return nil }
         
-        let validAuth: String? = auth ?? shared.auth
-        
-        guard let validAuth else {
-            LemmyLog("Authentication required")
-            return nil
-        }
-        
         return await shared.createPost(title,
                                        content: content,
                                        url: url,
                                        body: body,
                                        community: community,
-                                       auth: validAuth)
+                                       auth: auth)
     }
     
     @discardableResult
@@ -84,7 +86,15 @@ public extension Lemmy {
                     body: String? = nil,
                     nsfw: Bool = false,
                     language_id: LanguageId? = nil,
-                    auth: String) async -> PostView? {
+                    auth: String? = nil) async -> PostView? {
+        
+        let validAuth: String? = auth ?? self.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
         guard let result = try? await api.request(
             EditPost(
                 post_id: postId,
@@ -93,7 +103,7 @@ public extension Lemmy {
                 body: body,
                 nsfw: nsfw,
                 language_id: language_id,
-                auth: auth
+                auth: validAuth
             )
         ).async() else {
             return nil
@@ -110,33 +120,33 @@ public extension Lemmy {
                          language_id: LanguageId? = nil,
                          auth: String? = nil) async -> PostView? {
         guard let shared else { return nil }
-        
-        let validAuth: String? = auth ?? shared.auth
-        
-        guard let validAuth else {
-            LemmyLog("Authentication required")
-            return nil
-        }
-        
         return await shared.editPost(postId,
                                      title: title,
                                      url: url,
                                      body: body,
                                      nsfw: nsfw,
                                      language_id: language_id,
-                                     auth: validAuth)
+                                     auth: auth)
     }
     
     @discardableResult
     func createComment(_ content: String,
                        post: Post,
                        parent: Comment? = nil,
-                       auth: String) async -> Comment? {
+                       auth: String? = nil) async -> Comment? {
+        
+        let validAuth: String? = auth ?? self.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
         guard let result = try? await api.request(
             CreateComment(content: content,
                           post_id: post.id,
                           parent_id: parent?.id,
-                          auth: auth)
+                          auth: validAuth)
         ).async() else {
             return nil
         }
@@ -150,17 +160,10 @@ public extension Lemmy {
                               auth: String? = nil) async -> Comment? {
         guard let shared else { return nil }
         
-        let validAuth: String? = auth ?? shared.auth
-        
-        guard let validAuth else {
-            LemmyLog("Authentication required")
-            return nil
-        }
-        
         return await shared.createComment(content,
                                           post: post,
                                           parent: parent,
-                                          auth: validAuth)
+                                          auth: auth)
     }
     
     @discardableResult
@@ -168,13 +171,21 @@ public extension Lemmy {
                      content: String? = nil,
                      language_id: LanguageId? = nil,
                      form_id: String? = nil,
-                     auth: String) async -> Comment? {
+                     auth: String? = nil) async -> Comment? {
+        
+        let validAuth: String? = auth ?? self.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
         guard let result = try? await api.request(
             EditComment(comment_id: comment_id,
                         content: content,
                         language_id: language_id,
                         form_id: form_id,
-                        auth: auth
+                        auth: validAuth
             )
         ).async() else {
             return nil
@@ -190,17 +201,10 @@ public extension Lemmy {
                             auth: String? = nil) async -> Comment? {
         guard let shared else { return nil }
         
-        let validAuth: String? = auth ?? shared.auth
-        
-        guard let validAuth else {
-            LemmyLog("Authentication required")
-            return nil
-        }
-        
         return await shared.editComment(comment_id,
                                         content: content,
                                         language_id: language_id,
                                         form_id: form_id,
-                                        auth: validAuth)
+                                        auth: auth)
     }
 }
