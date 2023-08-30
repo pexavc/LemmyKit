@@ -2,14 +2,14 @@
 
 import Foundation
 
-public struct CommunityView: Codable, Hashable {
-	public var community: Community
+public struct LemmyCommunityView: Codable, Hashable {
+	public var community: LemmyCommunity
 	public let subscribed: SubscribedType
 	public let blocked: Bool
 	public let counts: CommunityAggregates
 
 	public init(
-		community: Community,
+		community: LemmyCommunity,
 		subscribed: SubscribedType,
 		blocked: Bool,
 		counts: CommunityAggregates

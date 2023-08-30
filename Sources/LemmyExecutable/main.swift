@@ -17,7 +17,7 @@ LemmyKit.baseUrl = "https://lemmy.world"
 
 
 let time = CFAbsoluteTimeGetCurrent()
-let instances = await Lemmy.getInstances()
+//let instances = await Lemmy.getInstances()
 print("\(CFAbsoluteTimeGetCurrent() - time)s to get all instances")
 
 

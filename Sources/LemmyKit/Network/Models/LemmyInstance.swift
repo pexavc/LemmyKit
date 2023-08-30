@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct Instance: Codable, Identifiable, Hashable {
+public struct LemmyInstance: Codable, Identifiable, Hashable {
 	public let id: InstanceId
 	public let domain: String
 	public let published: String

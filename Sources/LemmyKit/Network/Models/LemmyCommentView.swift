@@ -2,11 +2,11 @@
 
 import Foundation
 
-public struct CommentView: Codable, Hashable {
-	public var comment: Comment
-	public var creator: Person
-	public var post: Post
-	public var community: Community
+public struct LemmyCommentView: Codable, Hashable {
+	public var comment: LemmyComment
+	public var creator: LemmyPerson
+	public var post: LemmyPost
+	public var community: LemmyCommunity
 	public let counts: CommentAggregates
 	public let creator_banned_from_community: Bool
 	public let subscribed: SubscribedType
@@ -15,10 +15,10 @@ public struct CommentView: Codable, Hashable {
 	public let my_vote: Int?
 
 	public init(
-		comment: Comment,
-		creator: Person,
-		post: Post,
-		community: Community,
+		comment: LemmyComment,
+		creator: LemmyPerson,
+		post: LemmyPost,
+		community: LemmyCommunity,
 		counts: CommentAggregates,
 		creator_banned_from_community: Bool,
 		subscribed: SubscribedType,

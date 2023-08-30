@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct Person: Codable, Identifiable, Hashable {
+public struct LemmyPerson: Codable, Identifiable, Hashable {
 	public let id: PersonId
 	public let name: String
 	public let display_name: String?
@@ -65,8 +65,8 @@ public struct Person: Codable, Identifiable, Hashable {
 	}
 }
 
-public extension Person {
-    static var mock: Person {
+public extension LemmyPerson {
+    static var mock: LemmyPerson {
         .init(
             id: 0,
             name: "J. Doe",

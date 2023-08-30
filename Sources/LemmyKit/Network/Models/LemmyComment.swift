@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct Comment: Codable, Identifiable, Hashable {
+public struct LemmyComment: Codable, Identifiable, Hashable {
 	public let id: CommentId
 	public let creator_id: PersonId
 	public let post_id: PostId

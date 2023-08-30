@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct Community: Codable, Identifiable, Hashable {
+public struct LemmyCommunity: Codable, Identifiable, Hashable {
 	public let id: CommunityId
 	public let name: String
 	public let title: String
@@ -66,8 +66,8 @@ public struct Community: Codable, Identifiable, Hashable {
 	}
 }
 
-public extension Community {
-    static var mock: Community {
+public extension LemmyCommunity {
+    static var mock: LemmyCommunity {
         .init(
             id: 0,
             name: "mockcommunity",

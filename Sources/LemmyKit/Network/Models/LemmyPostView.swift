@@ -2,10 +2,10 @@
 
 import Foundation
 
-public struct PostView: Codable, Hashable {
-	public var post: Post
-	public var creator: Person
-	public var community: Community
+public struct LemmyPostView: Codable, Hashable {
+	public var post: LemmyPost
+	public var creator: LemmyPerson
+	public var community: LemmyCommunity
 	public let creator_banned_from_community: Bool
 	public let counts: PostAggregates
 	public let subscribed: SubscribedType
@@ -16,9 +16,9 @@ public struct PostView: Codable, Hashable {
 	public let unread_comments: Int
 
 	public init(
-		post: Post,
-		creator: Person,
-		community: Community,
+		post: LemmyPost,
+		creator: LemmyPerson,
+		community: LemmyCommunity,
 		creator_banned_from_community: Bool,
 		counts: PostAggregates,
 		subscribed: SubscribedType,
@@ -48,8 +48,8 @@ public struct PostView: Codable, Hashable {
     }
 }
 
-public extension PostView {
-    static var mock: PostView {
+public extension LemmyPostView {
+    static var mock: LemmyPostView {
         .init(
             post: .mock,
             creator: .mock,

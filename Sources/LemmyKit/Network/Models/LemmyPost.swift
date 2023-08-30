@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct Post: Codable, Identifiable, Hashable {
+public struct LemmyPost: Codable, Identifiable, Hashable {
 	public let id: PostId
 	public let name: String
 	public let url: String?
@@ -74,8 +74,8 @@ public struct Post: Codable, Identifiable, Hashable {
 	}
 }
 
-public extension Post {
-    static var mock: Post {
+public extension LemmyPost {
+    static var mock: LemmyPost {
         .init(
             id: 0,
             name: "Mock Post",

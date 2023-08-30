@@ -2,12 +2,12 @@
 
 import Foundation
 
-public struct PersonView: Codable, Hashable {
-	public let person: Person
+public struct LemmyPersonView: Codable, Hashable {
+	public let person: LemmyPerson
 	public let counts: PersonAggregates
 
 	public init(
-		person: Person,
+		person: LemmyPerson,
 		counts: PersonAggregates
 	) {
 		self.person = person

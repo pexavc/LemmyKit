@@ -3,14 +3,14 @@
 import Foundation
 
 public struct FederatedInstances: Codable, Hashable {
-	public let linked: [Instance]
-	public let allowed: [Instance]
-	public let blocked: [Instance]
+	public let linked: [LemmyInstance]
+	public let allowed: [LemmyInstance]
+	public let blocked: [LemmyInstance]
 
 	public init(
-		linked: [Instance],
-		allowed: [Instance],
-		blocked: [Instance]
+		linked: [LemmyInstance],
+		allowed: [LemmyInstance],
+		blocked: [LemmyInstance]
 	) {
 		self.linked = linked
 		self.allowed = allowed
