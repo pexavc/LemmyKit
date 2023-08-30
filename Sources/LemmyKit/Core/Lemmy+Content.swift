@@ -11,9 +11,16 @@ import Foundation
 
 public extension Lemmy {
     func uploadImage(_ imageData: Data,
-                     auth: String) async -> UploadImageResponse? {
+                     auth: String?) async -> UploadImageResponse? {
+        let validAuth: String? = auth ?? self.auth
+        
+        guard let validAuth else {
+            LemmyLog("Authentication required")
+            return nil
+        }
+        
         guard let result = try? await pictrs.request(
-            UploadImage(image: imageData, auth: auth)
+            UploadImage(image: imageData, auth: validAuth)
         ).async() else {
             return nil
         }
@@ -23,22 +30,22 @@ public extension Lemmy {
     static func uploadImage(_ imageData: Data, auth: String? = nil) async -> UploadImageResponse? {
         guard let shared else { return nil }
         
-        let validAuth: String? = auth ?? shared.auth
+        return await shared.uploadImage(imageData, auth: auth)
+    }
+    
+    func deleteImage(_ imageFile: ImageFile,
+                     auth: String?) async -> EmptyResponse? {
+        let validAuth: String? = auth ?? self.auth
         
         guard let validAuth else {
             LemmyLog("Authentication required")
             return nil
         }
         
-        return await shared.uploadImage(imageData, auth: validAuth)
-    }
-    
-    func deleteImage(_ imageFile: ImageFile,
-                     auth: String) async -> EmptyResponse? {
         guard let result = try? await pictrs.request(
             DeleteImage(file: imageFile.file,
                         deleteToken: imageFile.delete_token,
-                        auth: auth)
+                        auth: validAuth)
         ).async() else {
             return nil
         }
@@ -49,14 +56,7 @@ public extension Lemmy {
                             auth: String? = nil) async -> EmptyResponse? {
         guard let shared else { return nil }
         
-        let validAuth: String? = auth ?? shared.auth
-        
-        guard let validAuth else {
-            LemmyLog("Authentication required")
-            return nil
-        }
-        
-        return await shared.deleteImage(imageFile, auth: validAuth)
+        return await shared.deleteImage(imageFile, auth: auth)
     }
 }
 
