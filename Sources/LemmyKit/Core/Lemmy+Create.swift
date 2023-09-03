@@ -37,7 +37,6 @@ public extension Lemmy {
     
     @discardableResult
     func createPost(_ title: String,
-                    content: String,
                     url: String? = nil,
                     body: String? = nil,
                     community: Community,
@@ -64,7 +63,6 @@ public extension Lemmy {
     }
     @discardableResult
     static func createPost(_ title: String,
-                           content: String,
                            url: String? = nil,
                            body: String? = nil,
                            community: Community,
@@ -72,7 +70,6 @@ public extension Lemmy {
         guard let shared else { return nil }
         
         return await shared.createPost(title,
-                                       content: content,
                                        url: url,
                                        body: body,
                                        community: community,
