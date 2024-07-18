@@ -1,17 +1,15 @@
-/* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
-
 import Foundation
 
 public struct RegistrationApplicationView: Codable, Hashable {
-	public let registration_application: RegistrationApplication
-	public let creator_local_user: LocalUser
-	public let creator: Person
+	public let registration_application: RegistrationApplication?
+	public let creator_local_user: LocalUser?
+	public let creator: Person?
 	public let admin: Person?
 
 	public init(
-		registration_application: RegistrationApplication,
-		creator_local_user: LocalUser,
-		creator: Person,
+		registration_application: RegistrationApplication? = nil,
+		creator_local_user: LocalUser? = nil,
+		creator: Person? = nil,
 		admin: Person? = nil
 	) {
 		self.registration_application = registration_application

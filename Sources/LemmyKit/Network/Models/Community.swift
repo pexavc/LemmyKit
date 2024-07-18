@@ -1,49 +1,42 @@
-/* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
-
 import Foundation
 
 public struct Community: Codable, Identifiable, Hashable {
-	public let id: CommunityId
-	public let name: String
-	public let title: String
+	public let id: CommunityId?
+	public let name: String?
+	public let title: String?
 	public let description: String?
-	public let removed: Bool
-	public let published: String
+	public let removed: Bool?
+	public let published: String?
 	public let updated: String?
-	public let deleted: Bool
-	public let nsfw: Bool
-	public let actor_id: String
-	public let local: Bool
+	public let deleted: Bool?
+	public let nsfw: Bool?
+	public let actor_id: String?
+	public let local: Bool?
 	public let icon: String?
 	public let banner: String?
-	public let followers_url: String?
-	public let inbox_url: String?
-	public let hidden: Bool
-	public let posting_restricted_to_mods: Bool
-	public let instance_id: InstanceId
+	public let hidden: Bool?
+	public let posting_restricted_to_mods: Bool?
+	public let instance_id: InstanceId?
     
     public var location: FetchType? = .base
-    public var ap_id: String? = nil
 
 	public init(
-		id: CommunityId,
-		name: String,
-		title: String,
+		id: CommunityId? = nil,
+		name: String? = nil,
+		title: String? = nil,
 		description: String? = nil,
-		removed: Bool,
-		published: String,
+		removed: Bool? = nil,
+		published: String? = nil,
 		updated: String? = nil,
-		deleted: Bool,
-		nsfw: Bool,
-		actor_id: String,
-		local: Bool,
+		deleted: Bool? = nil,
+		nsfw: Bool? = nil,
+		actor_id: String? = nil,
+		local: Bool? = nil,
 		icon: String? = nil,
 		banner: String? = nil,
-		followers_url: String?,
-		inbox_url: String?,
-		hidden: Bool,
-		posting_restricted_to_mods: Bool,
-		instance_id: InstanceId
+		hidden: Bool? = nil,
+		posting_restricted_to_mods: Bool? = nil,
+		instance_id: InstanceId? = nil
 	) {
 		self.id = id
 		self.name = name
@@ -58,35 +51,8 @@ public struct Community: Codable, Identifiable, Hashable {
 		self.local = local
 		self.icon = icon
 		self.banner = banner
-		self.followers_url = followers_url
-		self.inbox_url = inbox_url
 		self.hidden = hidden
 		self.posting_restricted_to_mods = posting_restricted_to_mods
 		self.instance_id = instance_id
 	}
-}
-
-public extension Community {
-    static var mock: Community {
-        .init(
-            id: 0,
-            name: "mockcommunity",
-            title: "Mock Community",
-            description: "Lorem Ipsum",
-            removed: false,
-            published: "\(Date())",
-            updated: nil,
-            deleted: false,
-            nsfw: false,
-            actor_id: "",
-            local: false,
-            icon: "https://media.tpt.cloud/nextavenue/uploads/2021/09/bobrossestate-01.jpg",
-            banner: nil,
-            followers_url: nil,
-            inbox_url: nil,
-            hidden: false,
-            posting_restricted_to_mods: false,
-            instance_id: 0
-        )
-    }
 }

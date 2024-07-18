@@ -1,32 +1,27 @@
-/* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
-
 import Foundation
 
-public struct SiteAggregates: Codable, Identifiable, Hashable {
-	public let id: Int
-	public let site_id: SiteId
-	public let users: Int
-	public let posts: Int
-	public let comments: Int
-	public let communities: Int
-	public let users_active_day: Int
-	public let users_active_week: Int
-	public let users_active_month: Int
-	public let users_active_half_year: Int
+public struct SiteAggregates: Codable, Hashable {
+	public let site_id: SiteId?
+	public let users: Int?
+	public let posts: Int?
+	public let comments: Int?
+	public let communities: Int?
+	public let users_active_day: Int?
+	public let users_active_week: Int?
+	public let users_active_month: Int?
+	public let users_active_half_year: Int?
 
 	public init(
-		id: Int,
-		site_id: SiteId,
-		users: Int,
-		posts: Int,
-		comments: Int,
-		communities: Int,
-		users_active_day: Int,
-		users_active_week: Int,
-		users_active_month: Int,
-		users_active_half_year: Int
+		site_id: SiteId? = nil,
+		users: Int? = nil,
+		posts: Int? = nil,
+		comments: Int? = nil,
+		communities: Int? = nil,
+		users_active_day: Int? = nil,
+		users_active_week: Int? = nil,
+		users_active_month: Int? = nil,
+		users_active_half_year: Int? = nil
 	) {
-		self.id = id
 		self.site_id = site_id
 		self.users = users
 		self.posts = posts

@@ -1,54 +1,52 @@
-/* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
-
 import Foundation
 
 public struct Post: Codable, Identifiable, Hashable {
-	public let id: PostId
-	public let name: String
+	public let id: PostId?
+	public let name: String?
 	public let url: String?
 	public let body: String?
-	public let creator_id: PersonId
-	public let community_id: CommunityId
-	public let removed: Bool
-	public let locked: Bool
-	public let published: String
+	public let creator_id: PersonId?
+	public let community_id: CommunityId?
+	public let removed: Bool?
+	public let locked: Bool?
+	public let published: String?
 	public let updated: String?
-	public let deleted: Bool
-	public let nsfw: Bool
+	public let deleted: Bool?
+	public let nsfw: Bool?
 	public let embed_title: String?
 	public let embed_description: String?
 	public let thumbnail_url: String?
-	public let ap_id: String
-	public let local: Bool
+	public let ap_id: String?
+	public let local: Bool?
 	public let embed_video_url: String?
-	public let language_id: LanguageId
-	public let featured_community: Bool
-	public let featured_local: Bool
+	public let language_id: LanguageId?
+	public let featured_community: Bool?
+	public let featured_local: Bool?
     
     public var location: FetchType? = .base
 
 	public init(
-		id: PostId,
-		name: String,
+		id: PostId? = nil,
+		name: String? = nil,
 		url: String? = nil,
 		body: String? = nil,
-		creator_id: PersonId,
-		community_id: CommunityId,
-		removed: Bool,
-		locked: Bool,
-		published: String,
+		creator_id: PersonId? = nil,
+		community_id: CommunityId? = nil,
+		removed: Bool? = nil,
+		locked: Bool? = nil,
+		published: String? = nil,
 		updated: String? = nil,
-		deleted: Bool,
-		nsfw: Bool,
+		deleted: Bool? = nil,
+		nsfw: Bool? = nil,
 		embed_title: String? = nil,
 		embed_description: String? = nil,
 		thumbnail_url: String? = nil,
-		ap_id: String,
-		local: Bool,
+		ap_id: String? = nil,
+		local: Bool? = nil,
 		embed_video_url: String? = nil,
-		language_id: LanguageId,
-		featured_community: Bool,
-		featured_local: Bool
+		language_id: LanguageId? = nil,
+		featured_community: Bool? = nil,
+		featured_local: Bool? = nil
 	) {
 		self.id = id
 		self.name = name
@@ -72,32 +70,4 @@ public struct Post: Codable, Identifiable, Hashable {
 		self.featured_community = featured_community
 		self.featured_local = featured_local
 	}
-}
-
-public extension Post {
-    static var mock: Post {
-        .init(
-            id: 0,
-            name: "Mock Post",
-            url: "https://google.com",
-            body: "Lorem ipsum",
-            creator_id: 12,
-            community_id: 12,
-            removed: false,
-            locked: false,
-            published: "\(Date())",
-            updated: nil,
-            deleted: false,
-            nsfw: false,
-            embed_title: nil,
-            embed_description: nil,
-            thumbnail_url: "https://static01.nyt.com/images/2019/07/13/arts/13video/bob-ross-cover-superJumbo-v2.png",
-            ap_id: "",
-            local: true,
-            embed_video_url: nil,
-            language_id: 0,
-            featured_community: false,
-            featured_local: false
-        )
-    }
 }

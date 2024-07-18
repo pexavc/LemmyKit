@@ -1,37 +1,41 @@
-/* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
-
 import Foundation
 
 public struct PostView: Codable, Hashable {
-	public var post: Post
-	public var creator: Person
-	public var community: Community
-	public let creator_banned_from_community: Bool
-	public let counts: PostAggregates
-	public let subscribed: SubscribedType
-	public let saved: Bool
-	public let read: Bool
-	public let creator_blocked: Bool
+	public var post: Post?
+	public var creator: Person?
+	public var community: Community?
+	public let creator_banned_from_community: Bool?
+	public let creator_is_moderator: Bool?
+	public let creator_is_admin: Bool?
+	public let counts: PostAggregates?
+	public let subscribed: SubscribedType?
+	public let saved: Bool?
+	public let read: Bool?
+	public let creator_blocked: Bool?
 	public let my_vote: Int?
-	public let unread_comments: Int
+	public let unread_comments: Int?
 
 	public init(
-		post: Post,
-		creator: Person,
-		community: Community,
-		creator_banned_from_community: Bool,
-		counts: PostAggregates,
-		subscribed: SubscribedType,
-		saved: Bool,
-		read: Bool,
-		creator_blocked: Bool,
+		post: Post? = nil,
+		creator: Person? = nil,
+		community: Community? = nil,
+		creator_banned_from_community: Bool? = nil,
+		creator_is_moderator: Bool? = nil,
+		creator_is_admin: Bool? = nil,
+		counts: PostAggregates? = nil,
+		subscribed: SubscribedType? = nil,
+		saved: Bool? = nil,
+		read: Bool? = nil,
+		creator_blocked: Bool? = nil,
 		my_vote: Int? = nil,
-		unread_comments: Int
+		unread_comments: Int? = nil
 	) {
 		self.post = post
 		self.creator = creator
 		self.community = community
 		self.creator_banned_from_community = creator_banned_from_community
+		self.creator_is_moderator = creator_is_moderator
+		self.creator_is_admin = creator_is_admin
 		self.counts = counts
 		self.subscribed = subscribed
 		self.saved = saved
@@ -42,26 +46,8 @@ public struct PostView: Codable, Hashable {
 	}
     
     mutating func update(location: FetchType) {
-        post.location = location
-        creator.location = location
-        community.location = location
-    }
-}
-
-public extension PostView {
-    static var mock: PostView {
-        .init(
-            post: .mock,
-            creator: .mock,
-            community: .mock,
-            creator_banned_from_community: false,
-            counts: .mock,
-            subscribed: .notSubscribed,
-            saved: false,
-            read: false,
-            creator_blocked: false,
-            my_vote: 0,
-            unread_comments: 0
-        )
+        post?.location = location
+        creator?.location = location
+        community?.location = location
     }
 }

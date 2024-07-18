@@ -456,14 +456,14 @@ struct FetchResolver {
         let resolver: FetchResolver
         switch location {
         case .source:
-            let isBase: Bool = LemmyKit.host == community?.actor_id.host
+            let isBase: Bool = LemmyKit.host == community?.actor_id?.host
             resolver = .init(useBase: isBase,
                       actor: community?.actor_id,
                       id: nil,
                       name: community?.name)
         case .peer(let host):
             let isBase: Bool = LemmyKit.host == host
-            let peerName: String? = (community?.name ?? "")+"@"+(community?.actor_id.host ?? "")
+            let peerName: String? = (community?.name ?? "")+"@"+(community?.actor_id?.host ?? "")
             
             resolver = .init(useBase: isBase,
                              actor: host,
@@ -480,7 +480,7 @@ struct FetchResolver {
                     LemmyLog("resolving \(resolvedCommunity.id)", logLevel: .debug)
                     community = resolvedCommunity
                     id = resolvedCommunity.id
-                    name = (resolvedCommunity.name)+"@"+(actor_id.host ?? "")
+                    name = (resolvedCommunity.name ?? "unknown")+"@"+(actor_id.host ?? "")
                 } else {
                     name = (community?.name ?? "")+"@"+(actor_id.host ?? "")
                 }
@@ -511,8 +511,8 @@ struct FetchResolver {
         case .peer(let host):
             let sourceId: Int?
             let host = host.host ?? host
-            if host == post?.ap_id.host {
-                sourceId = Int(post?.ap_id.components(separatedBy: "/").last ?? "")
+            if host == post?.ap_id?.host {
+                sourceId = Int((post?.ap_id ?? "-1").components(separatedBy: "/").last ?? "")
             } else {
                 sourceId = nil
             }

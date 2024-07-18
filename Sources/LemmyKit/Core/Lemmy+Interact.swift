@@ -21,7 +21,7 @@ public extension Lemmy {
         }
         
         guard let result = try? await api.request(
-            CreatePostLike(post_id: post.id,
+            CreatePostLike(post_id: post.id ?? -1,
                            score: score,
                            auth: validAuth)
         ).async() else {
@@ -69,7 +69,7 @@ public extension Lemmy {
                            auth: String? = nil) async -> PostResponse? {
         guard let shared else { return nil }
         
-        return await shared.removePost(post_id: post.id,
+        return await shared.removePost(post_id: post.id ?? -1,
                                        removed: removed,
                                        reason: reason,
                                        auth: auth)
@@ -101,7 +101,7 @@ public extension Lemmy {
                            auth: String? = nil) async -> PostResponse? {
         guard let shared else { return nil }
         
-        return await shared.deletePost(post_id: post.id,
+        return await shared.deletePost(post_id: post.id ?? -1,
                                        deleted: deleted,
                                        auth: auth)
     }
@@ -118,7 +118,7 @@ public extension Lemmy {
         }
 
         guard let result = try? await api.request(
-            SavePost(post_id: post.id,
+            SavePost(post_id: post.id ?? -1,
                      save: save,
                      auth: validAuth)
         ).async() else {
@@ -147,7 +147,7 @@ public extension Lemmy {
         }
         
         guard let result = try? await api.request(
-            CreateCommentLike(comment_id: comment.id,
+            CreateCommentLike(comment_id: comment.id ?? -1,
                               score: score,
                               auth: validAuth)
         ).async() else {
@@ -194,7 +194,7 @@ public extension Lemmy {
                               auth: String? = nil) async -> CommentResponse? {
         guard let shared else { return nil }
         
-        return await shared.removeComment(comment_id: comment.id,
+        return await shared.removeComment(comment_id: comment.id ?? -1,
                                           removed: removed,
                                           reason: reason,
                                           auth: auth)
@@ -224,7 +224,7 @@ public extension Lemmy {
                               deleted: Bool,
                               auth: String? = nil) async -> CommentResponse? {
         guard let shared else { return nil }
-        return await shared.deleteComment(comment_id: comment.id,
+        return await shared.deleteComment(comment_id: comment.id ?? -1,
                                           deleted: deleted,
                                           auth: auth)
     }
@@ -241,7 +241,7 @@ public extension Lemmy {
         }
         
         guard let result = try? await api.request(
-            SaveComment(comment_id: comment.id,
+            SaveComment(comment_id: comment.id ?? -1,
                         save: save,
                         auth: validAuth)
         ).async() else {
@@ -277,7 +277,7 @@ public extension Lemmy {
         }
         
         guard let result = try? await api.request(
-            CreatePostReport(post_id: post.id,
+            CreatePostReport(post_id: post.id ?? -1,
                              reason: reason,
                              auth: validAuth)
         ).async() else {
@@ -309,7 +309,7 @@ public extension Lemmy {
         }
         
         guard let result = try? await api.request(
-            CreateCommentReport(comment_id: comment.id,
+            CreateCommentReport(comment_id: comment.id ?? -1,
                                 reason: reason,
                                 auth: validAuth)
         ).async() else {
@@ -340,7 +340,7 @@ public extension Lemmy {
         }
         
         guard let result = try? await api.request(
-            BlockPerson(person_id: person.id,
+            BlockPerson(person_id: person.id ?? -1,
                         block: block,
                         auth: validAuth)
         ).async() else {
@@ -372,7 +372,7 @@ public extension Lemmy {
         }
         
         guard let result = try? await api.request(
-            BlockCommunity(community_id: community.id,
+            BlockCommunity(community_id: community.id ?? -1,
                            block: block,
                            auth: validAuth)
         ).async() else {
@@ -407,7 +407,7 @@ public extension Lemmy {
         }
         
         guard let result = try? await api.request(
-            FollowCommunity(community_id: community.id,
+            FollowCommunity(community_id: community.id ?? -1,
                             follow: follow,
                             auth: validAuth)
         ).async() else {

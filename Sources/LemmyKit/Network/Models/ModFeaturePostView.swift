@@ -1,18 +1,16 @@
-/* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
-
 import Foundation
 
 public struct ModFeaturePostView: Codable, Hashable {
-	public let mod_feature_post: ModFeaturePost
+	public let mod_feature_post: ModFeaturePost?
 	public let moderator: Person?
-	public let post: Post
-	public let community: Community
+	public let post: Post?
+	public let community: Community?
 
 	public init(
-		mod_feature_post: ModFeaturePost,
+		mod_feature_post: ModFeaturePost? = nil,
 		moderator: Person? = nil,
-		post: Post,
-		community: Community
+		post: Post? = nil,
+		community: Community? = nil
 	) {
 		self.mod_feature_post = mod_feature_post
 		self.moderator = moderator

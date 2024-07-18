@@ -86,7 +86,7 @@ public extension Lemmy {
         
         switch resource {
         case .post(let model):
-            q = model.post.ap_id
+            q = model.post?.ap_id ?? ""
         default:
             q = ""
         }
@@ -103,14 +103,14 @@ public extension Lemmy {
         switch resource {
         case .post:
             guard let model = result.post else { return nil }
-            LemmyLog("resolved: \(model.post.id)", logLevel: .debug)
+            LemmyLog("resolved: \(model.post?.id)", logLevel: .debug)
             return .post(model)
         case .comment:
             guard let model = result.comment else { return nil }
             return .comment(model)
         case .creator:
             guard let model = result.person else { return nil }
-            LemmyLog("resolved: \(model.person.id)", logLevel: .debug)
+            LemmyLog("resolved: \(model.person?.id)", logLevel: .debug)
             return .creator(model)
         case .community:
             guard let model = result.community else { return nil }

@@ -1,18 +1,16 @@
-/* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
-
 import Foundation
 
 public struct SiteView: Codable, Hashable {
-	public let site: Site
-	public let local_site: LocalSite
-	public let local_site_rate_limit: LocalSiteRateLimit
-	public let counts: SiteAggregates
+	public let site: Site?
+	public let local_site: LocalSite?
+	public let local_site_rate_limit: LocalSiteRateLimit?
+	public let counts: SiteAggregates?
 
 	public init(
-		site: Site,
-		local_site: LocalSite,
-		local_site_rate_limit: LocalSiteRateLimit,
-		counts: SiteAggregates
+		site: Site? = nil,
+		local_site: LocalSite? = nil,
+		local_site_rate_limit: LocalSiteRateLimit? = nil,
+		counts: SiteAggregates? = nil
 	) {
 		self.site = site
 		self.local_site = local_site

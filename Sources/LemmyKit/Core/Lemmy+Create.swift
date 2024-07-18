@@ -51,7 +51,7 @@ public extension Lemmy {
         
         guard let result = try? await api.request(
             CreatePost(name: title,
-                       community_id: community.id,
+                       community_id: community.id ?? -1,
                        url: url,
                        body: body,
                        auth: validAuth)
@@ -141,7 +141,7 @@ public extension Lemmy {
         
         guard let result = try? await api.request(
             CreateComment(content: content,
-                          post_id: post.id,
+                          post_id: post.id ?? -1,
                           parent_id: parent?.id,
                           auth: validAuth)
         ).async() else {

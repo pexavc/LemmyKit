@@ -35,7 +35,7 @@ public struct GetCommunity: Request {
         return publisher
             .map { response in
                 var mutable = response.community_view
-                mutable.community.location = location
+                mutable.community?.location = location
                 return GetCommunityResponse(community_view: mutable, moderators: response.moderators, discussion_languages: response.discussion_languages)
             }.eraseToAnyPublisher()
     }
@@ -46,7 +46,7 @@ public struct GetCommunity: Request {
 }
 
 public struct GetCommunityResponse: Codable, Hashable {
-	public let community_view: CommunityView
+	public var community_view: CommunityView
 	public let site: Site?
 	public let moderators: [CommunityModeratorView]
 	public let discussion_languages: [LanguageId]

@@ -12,7 +12,7 @@ public class Lemmy {
     public class Metadata {
         public var site: Site
         public init(siteView: SiteView) {
-            self.site = siteView.site
+            self.site = siteView.site ?? .init()
         }
     }
     
@@ -81,12 +81,12 @@ public class Lemmy {
     }
     
     internal func update(site: GetSiteResponse?) {
-        instanceId = site?.site_view.site.instance_id
+        instanceId = site?.site_view.site?.instance_id
         admins = site?.admins ?? []
         emojis = site?.custom_emojis ?? []
         stats = site?.site_view.counts
         user = site?.my_user
-        print("[LemmyKit] Setting session user: \(site?.my_user?.local_user_view.person.name), from: \(site?.my_user?.local_user_view.person.actor_id)")
+        //print("[LemmyKit] Setting session user: \(site?.my_user?.local_user_view?.person.name), from: \(site?.my_user?.local_user_view.person.actor_id)")
         if let view = site?.site_view {
             metadata = .init(siteView: view)
         }
@@ -99,18 +99,18 @@ public class Lemmy {
         let instances = await Lemmy.instances()
         
         for instance in instances?.allowed ?? [] {
-            self.allowedInstances[instance.id] = instance
-            self.allInstances[instance.id] = instance
+            self.allowedInstances[instance.id ?? -1] = instance.toInstance
+            self.allInstances[instance.id ?? -1] = instance.toInstance
         }
         
         for instance in instances?.linked ?? [] {
-            self.linkedInstances[instance.id] = instance
-            self.allInstances[instance.id] = instance
+            self.linkedInstances[instance.id ?? -1] = instance.toInstance
+            self.allInstances[instance.id ?? -1] = instance.toInstance
         }
         
         for instance in instances?.blocked ?? [] {
-            self.blockedInstances[instance.id] = instance
-            self.allInstances[instance.id] = instance
+            self.blockedInstances[instance.id ?? -1] = instance.toInstance
+            self.allInstances[instance.id ?? -1] = instance.toInstance
         }
         
         instancesLoaded = true
@@ -139,7 +139,7 @@ public class Lemmy {
     }
     
     public func getInstancedDomain(community: Community, instanceId: Int? = nil) -> String? {
-        var id: Int = instanceId ?? community.instance_id
+        var id: Int = instanceId ?? (community.instance_id ?? -1)
         var instancedDomain: String? = nil
         
         if let allowedInstance = allowedInstances[id] {

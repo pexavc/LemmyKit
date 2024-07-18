@@ -47,7 +47,7 @@ extension CommentView: LemmyResource {
 //            hosts += [peerHost]
 //        }
         
-        if let peerHost = post.ap_id.host,
+        if let peerHost = post?.ap_id?.host,
            peerHost != hosts.last,
            peerHost != LemmyKit.host {
             hosts += [peerHost]
@@ -57,11 +57,11 @@ extension CommentView: LemmyResource {
     }
     
     public var isBaseResource: Bool {
-        LemmyKit.host == community.actor_id.host
+        LemmyKit.host == community?.actor_id?.host
     }
     
     public var isPeerResource: Bool {
-        community.actor_id.host != creator.actor_id.host
+        community?.actor_id?.host != creator?.actor_id?.host
     }
     
     public func host(for location: FetchType) -> String {
@@ -69,7 +69,7 @@ extension CommentView: LemmyResource {
         case .base:
             return LemmyKit.host
         case .source:
-            return community.actor_id.host ?? LemmyKit.host
+            return community?.actor_id?.host ?? LemmyKit.host
         case .peer(let host):
             return host
         }
@@ -78,7 +78,7 @@ extension CommentView: LemmyResource {
     public func location(for host: String) -> FetchType {
         if LemmyKit.host == host {
             return .base
-        } else if community.actor_id.host ?? LemmyKit.host == host {
+        } else if community?.actor_id?.host ?? LemmyKit.host == host {
             return .source
         } else {
             return .peer(host)
@@ -96,7 +96,7 @@ extension PostView: LemmyResource {
 //            hosts += [baseHost]
 //        }
         
-        if let peerHost = creator.actor_id.host,
+        if let peerHost = creator?.actor_id?.host,
            peerHost != hosts.last,
            peerHost != LemmyKit.host {
             hosts += [peerHost]
@@ -106,11 +106,11 @@ extension PostView: LemmyResource {
     }
     
     public var isBaseResource: Bool {
-        LemmyKit.host == community.actor_id.host
+        LemmyKit.host == community?.actor_id?.host
     }
     
     public var isPeerResource: Bool {
-        community.actor_id.host != creator.actor_id.host
+        community?.actor_id?.host != creator?.actor_id?.host
     }
     
     public func host(for location: FetchType) -> String {
@@ -118,7 +118,7 @@ extension PostView: LemmyResource {
         case .base:
             return LemmyKit.host
         case .source:
-            return community.actor_id.host ?? LemmyKit.host
+            return community?.actor_id?.host ?? LemmyKit.host
         case .peer(let host):
             return host
         }
@@ -127,7 +127,7 @@ extension PostView: LemmyResource {
     public func location(for host: String) -> FetchType {
         if LemmyKit.host == host {
             return .base
-        } else if community.actor_id.host ?? LemmyKit.host == host {
+        } else if community?.actor_id?.host ?? LemmyKit.host == host {
             return .source
         } else {
             return .peer(host)
@@ -139,7 +139,7 @@ extension CommunityView: LemmyResource {
     public var viewableHosts: [String] {
         var hosts: [String] = [LemmyKit.host]
         
-        if let baseHost = community.actor_id.host,
+        if let baseHost = community?.actor_id?.host,
            baseHost != hosts.last {
             hosts += [baseHost]
         }
@@ -148,7 +148,7 @@ extension CommunityView: LemmyResource {
     }
     
     public var isBaseResource: Bool {
-        LemmyKit.host == community.actor_id.host
+        LemmyKit.host == community?.actor_id?.host
     }
     
     public var isPeerResource: Bool {
@@ -160,7 +160,7 @@ extension CommunityView: LemmyResource {
         case .base:
             return LemmyKit.host
         case .source:
-            return community.actor_id.host ?? LemmyKit.host
+            return community?.actor_id?.host ?? LemmyKit.host
         case .peer(let host):
             return host
         }
@@ -169,7 +169,7 @@ extension CommunityView: LemmyResource {
     public func location(for host: String) -> FetchType {
         if LemmyKit.host == host {
             return .base
-        } else if community.actor_id.host ?? LemmyKit.host == host {
+        } else if community?.actor_id?.host ?? LemmyKit.host == host {
             return .source
         } else {
             return .peer(host)
@@ -196,7 +196,7 @@ extension PersonView: LemmyResource {
     public var viewableHosts: [String] {
         var hosts: [String] = [LemmyKit.host]
         
-        if let baseHost = self.person.actor_id.host,
+        if let baseHost = self.person?.actor_id?.host,
            baseHost != hosts.last {
             hosts += [baseHost]
         }
@@ -205,7 +205,7 @@ extension PersonView: LemmyResource {
     }
     
     public var isBaseResource: Bool {
-        LemmyKit.host == person.actor_id.host
+        LemmyKit.host == person?.actor_id?.host
     }
     
     public var isPeerResource: Bool {
@@ -217,7 +217,7 @@ extension PersonView: LemmyResource {
         case .base:
             return LemmyKit.host
         case .source:
-            return person.actor_id.host ?? LemmyKit.host
+            return person?.actor_id?.host ?? LemmyKit.host
         case .peer(let host):
             return host
         }
@@ -226,7 +226,7 @@ extension PersonView: LemmyResource {
     public func location(for host: String) -> FetchType {
         if LemmyKit.host == host {
             return .base
-        } else if person.actor_id.host ?? LemmyKit.host == host {
+        } else if person?.actor_id?.host ?? LemmyKit.host == host {
             return .source
         } else {
             return .peer(host)

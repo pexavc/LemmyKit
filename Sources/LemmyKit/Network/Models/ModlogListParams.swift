@@ -1,5 +1,3 @@
-/* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
-
 import Foundation
 
 public struct ModlogListParams: Codable, Hashable {
@@ -8,7 +6,7 @@ public struct ModlogListParams: Codable, Hashable {
 	public let other_person_id: PersonId?
 	public let page: Int?
 	public let limit: Int?
-	public let hide_modlog_names: Bool
+	public let hide_modlog_names: Bool?
 
 	public init(
 		community_id: CommunityId? = nil,
@@ -16,7 +14,7 @@ public struct ModlogListParams: Codable, Hashable {
 		other_person_id: PersonId? = nil,
 		page: Int? = nil,
 		limit: Int? = nil,
-		hide_modlog_names: Bool
+		hide_modlog_names: Bool? = nil
 	) {
 		self.community_id = community_id
 		self.mod_person_id = mod_person_id

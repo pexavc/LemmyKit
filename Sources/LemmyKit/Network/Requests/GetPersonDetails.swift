@@ -51,7 +51,7 @@ public struct GetPersonDetails: Request {
                 for post in response.posts {
                     var newPost = post
                     newPost.update(location: self.location)
-                    newPost.community.ap_id = newPost.post.ap_id
+                    //newPost.community.ap_id = newPost.post.ap_id //TODO: ruh roh
                     newPosts.append(newPost)
                 }
                 

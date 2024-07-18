@@ -1,18 +1,16 @@
-/* auto transpiled from lemmy-js-client (https://github.com/LemmyNet/lemmy-js-client) */
-
 import Foundation
 
 public struct ModTransferCommunityView: Codable, Hashable {
-	public let mod_transfer_community: ModTransferCommunity
+	public let mod_transfer_community: ModTransferCommunity?
 	public let moderator: Person?
-	public let community: Community
-	public let modded_person: Person
+	public let community: Community?
+	public let modded_person: Person?
 
 	public init(
-		mod_transfer_community: ModTransferCommunity,
+		mod_transfer_community: ModTransferCommunity? = nil,
 		moderator: Person? = nil,
-		community: Community,
-		modded_person: Person
+		community: Community? = nil,
+		modded_person: Person? = nil
 	) {
 		self.mod_transfer_community = mod_transfer_community
 		self.moderator = moderator

@@ -1,12 +1,13 @@
 import Foundation
 
-public struct Instance: Codable, Identifiable, Hashable {
+public struct InstanceWithFederationState: Codable, Identifiable, Hashable {
 	public let id: InstanceId?
 	public let domain: String?
 	public let published: String?
 	public let updated: String?
 	public let software: String?
 	public let version: String?
+	public let federation_state: ReadableFederationState?
 
 	public init(
 		id: InstanceId? = nil,
@@ -14,7 +15,8 @@ public struct Instance: Codable, Identifiable, Hashable {
 		published: String? = nil,
 		updated: String? = nil,
 		software: String? = nil,
-		version: String? = nil
+		version: String? = nil,
+		federation_state: ReadableFederationState? = nil
 	) {
 		self.id = id
 		self.domain = domain
@@ -22,18 +24,6 @@ public struct Instance: Codable, Identifiable, Hashable {
 		self.updated = updated
 		self.software = software
 		self.version = version
+		self.federation_state = federation_state
 	}
-}
-
-extension InstanceWithFederationState {
-    var toInstance: Instance {
-        .init(
-            id: self.id,
-            domain: self.domain,
-            published: self.published,
-            updated: self.updated,
-            software: self.software,
-            version: self.version
-        )
-    }
 }
